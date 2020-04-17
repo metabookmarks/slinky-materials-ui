@@ -1,4 +1,4 @@
-package io.metabookmarks.webui.ui.mdc
+package io.metabookmarks.slinky.mdc
 
 import slinky.core.annotations.react
 import slinky.core.Component

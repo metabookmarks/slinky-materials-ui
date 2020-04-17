@@ -10,7 +10,7 @@ class WebService() extends Directives {
     pathSingleSlash {
       get {
         complete {
-          com.example.akkahttpscalajs.html.index.render(SharedMessages.itWorks)
+          io.metabookmarks.demo.html.index.render(SharedMessages.itWorks)
         }
       }
     } ~

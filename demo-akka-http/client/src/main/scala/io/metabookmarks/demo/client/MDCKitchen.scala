@@ -5,7 +5,7 @@ import org.scalajs.dom
 import org.scalajs.dom.html
 import slinky.core.annotations.react
 import slinky.core.StatelessComponent
-import io.metabookmarks.webui.ui.mdc._
+import io.metabookmarks.slinky.mdc._
 
 import slinky.web.ReactDOM
 import slinky.web.html._
@@ -15,6 +15,7 @@ import slinky.core.SyntheticEvent
 import org.scalajs.dom.raw.Event
 import io.metabookmarks.demo.client.DialogDemo
 import io.metabookmarks.demo.client.FormDemo
+import io.metabookmarks.slinky.mdc.progress.CircurlarProgress
 
 object MDCKitchen {
 
@@ -27,10 +28,10 @@ object MDCKitchen {
           items = List(
             "Home" icon "home" href "/",
             "Dashboard" icon "dashboard" href "/",
-            "Drafts" icon "drafts" href "/drafts",
+            "Progress" icon "refresh" content CircurlarProgress(),
             "Dialog" icon "widgets" content DialogDemo(name = "zozo")
           ),
-          Some(FormDemo(name = "dialog demo"))
+          Some(CircurlarProgress())
         ),
         container
       )

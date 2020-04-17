@@ -48,7 +48,7 @@ lazy val server = project
     scalaJSProjects := Seq(client),
     pipelineStages in Assets := Seq(scalaJSPipeline),
     npmAssets ++= NpmAssets
-        .ofProject(`client`)(modules => (modules / "material-components-web" / "dist").allPaths)
+        .ofProject(`client`)(modules => (modules / "material-components-web" ).allPaths)
         .value,
     // triggers scalaJSPipeline when using compile or continuous compilation
     compile in Compile := ((compile in Compile) dependsOn scalaJSPipeline).value,
@@ -76,7 +76,7 @@ lazy val client = project
     libraryDependencies ++= Seq(
         "org.scala-js" %%% "scalajs-dom" % "1.0.0"
       ),
-    Compile / npmDependencies += "material-components-web" -> "^5.1.0",
+    Compile / npmDependencies += "material-components-web" -> "6.0.0-canary.4b04cdb0f.0",
     Compile / npmDependencies += "react" -> "16.12.0",
     Compile / npmDependencies += "react-dom" -> "16.12.0"
   )

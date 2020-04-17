@@ -13,5 +13,6 @@
   <body>
    @content
    @scalajs.html.scripts("client", name => s"/assets/$name", name => getClass.getResource(s"/public/$name") != null)
+  <script src="/assets/material-components-web.min.js"></script>
   </body>
 </html>

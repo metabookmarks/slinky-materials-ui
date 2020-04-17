@@ -2,7 +2,8 @@ package io.metabookmarks.demo.client
 
 import slinky.core.annotations.react
 import slinky.core.StatelessComponent
-import io.metabookmarks.webui.ui.mdc.Dialog
+import io.metabookmarks.slinky.mdc._
+
 import slinky.web.html._
 @react class DialogDemo extends StatelessComponent {
   case class Props(name: String)

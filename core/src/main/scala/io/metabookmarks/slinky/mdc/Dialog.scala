@@ -1,4 +1,4 @@
-package io.metabookmarks.webui.ui.mdc
+package io.metabookmarks.slinky.mdc
 
 import org.scalajs.dom
 import org.scalajs.dom.document
