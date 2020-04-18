@@ -25,7 +25,7 @@ import org.scalajs.dom.raw.Element
 
   private def menuItem(item: MenuItem) = item match {
     case MenuURLItem(label, icon, url) =>
-      a(className := "mdc-list-item", href := url, key := label)(
+      a(className := "mdc-list-item", href := url)(
         i(className := "material-icons mdc-list-item__start-detail", aria - "hidden" := "true")(icon),
         label
       )

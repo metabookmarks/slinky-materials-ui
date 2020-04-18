@@ -16,6 +16,8 @@ import org.scalajs.dom.raw.Event
 import io.metabookmarks.demo.client.DialogDemo
 import io.metabookmarks.demo.client.FormDemo
 import io.metabookmarks.slinky.mdc.progress.CircurlarProgress
+import org.scalajs.dom.raw.DataTransfer
+import io.metabookmarks.demo.client.ChipsDemo
 
 object MDCKitchen {
 
@@ -28,10 +30,13 @@ object MDCKitchen {
           items = List(
             "Home" icon "home" href "/",
             "Dashboard" icon "dashboard" href "/",
+            "Chips" icon "widgets" content ChipsDemo(),
             "Progress" icon "refresh" content CircurlarProgress(),
             "Dialog" icon "widgets" content DialogDemo(name = "zozo")
           ),
-          Some(CircurlarProgress())
+          Some(
+            "Welcome"
+          )
         ),
         container
       )
