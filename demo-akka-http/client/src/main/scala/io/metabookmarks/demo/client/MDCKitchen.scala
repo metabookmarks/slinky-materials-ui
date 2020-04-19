@@ -15,9 +15,10 @@ import slinky.core.SyntheticEvent
 import org.scalajs.dom.raw.Event
 import io.metabookmarks.demo.client.DialogDemo
 import io.metabookmarks.demo.client.FormDemo
-import io.metabookmarks.slinky.mdc.progress.CircurlarProgress
+
 import org.scalajs.dom.raw.DataTransfer
 import io.metabookmarks.demo.client.ChipsDemo
+import slinky.materialui.core._
 
 object MDCKitchen {
 
@@ -31,11 +32,12 @@ object MDCKitchen {
             "Home" icon "home" href "/",
             "Dashboard" icon "dashboard" href "/",
             "Chips" icon "widgets" content ChipsDemo(),
-            "Progress" icon "refresh" content CircurlarProgress(),
+            "Progress" icon "refresh" content CircularProgress(),
             "Dialog" icon "widgets" content DialogDemo(name = "zozo")
           ),
           Some(
-            "Welcome"
+            Button(color = "secondary", disabled = true)("Default button")
+            //          KeyboardDatePicker(value = "03/22/1971")
           )
         ),
         container

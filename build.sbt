@@ -1,16 +1,17 @@
 enablePlugins(ScalaJSPlugin)
 
+val scala212 = "2.12.10"
+val scala213 = "2.13.1"
 
 name := "Scala.js Slinky Material UI"
 inThisBuild(
   List(
-    scalaVersion := "2.13.1",
+    scalaVersion := scala213,
     scalafmtOnCompile := true,
     organization := "io.metabookmarks",
     scalacOptions ++= Seq("-deprecation", "-feature", "-Xfatal-warnings", "-Ymacro-annotations")
   )
 )
-
 
 lazy val slinkyMaterial = project
   .in(file("."))
@@ -27,6 +28,97 @@ lazy val slinkyMaterial = project
   )
 
 val slinkyVersion = "0.6.5"
+
+lazy val librarySettings = Seq(
+  scalacOptions += {
+    val origVersion = version.value
+    val githubVersion = if (origVersion.contains("-")) {
+      origVersion.split('-').last
+    } else {
+      s"v$origVersion"
+    }
+
+    val a = baseDirectory.value.toURI
+    val g = "https://raw.githubusercontent.com/metabookmarks/slinky-materials-ui"
+    s"-P:scalajs:mapSourceURI:$a->$g/$githubVersion/${baseDirectory.value.getName}/"
+  },
+  scalacOptions --= Seq(
+      "-Ywarn-unused:params",
+      "-Ywarn-unused:patvars",
+      "-Ywarn-dead-code",
+      "-Xcheckinit",
+      "-Wunused:params",
+      "-Wunused:patvars",
+      "-Wdead-code"
+    )
+)
+
+lazy val crossScalaSettings = Seq(
+  crossScalaVersions := Seq(scala212, scala213),
+  Compile / unmanagedSourceDirectories += {
+    val sourceDir = (Compile / sourceDirectory).value
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, n)) if n >= 13 => sourceDir / "scala-2.13+"
+      case _ => sourceDir / "scala-2.13-"
+    }
+  },
+  Test / unmanagedSourceDirectories += {
+    val sourceDir = (Test / sourceDirectory).value
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, n)) if n >= 13 => sourceDir / "scala-2.13+"
+      case _ => sourceDir / "scala-2.13-"
+    }
+  }
+)
+
+lazy val generator = project
+
+//fork in Debug := true
+
+lazy val `material-ui` = project
+  .in(file("material-ui"))
+  .settings(
+    Compile / sourceGenerators += Def
+        .taskDyn[Seq[File]] {
+          val baseDir = baseDirectory.value
+          val rootFolder = (Compile / sourceManaged).value / "slinky/material-ui"
+          rootFolder.mkdirs()
+
+          val core = (generator / Compile / runMain)
+            .toTask {
+              Seq("slinky.generator.ExtrernalComponentGenerator",
+               "@material-ui/core",
+                            (baseDir / "/core.json").getAbsolutePath,
+                            (rootFolder.getAbsolutePath),
+                            "slinky.materialui")
+                .mkString(" ", " ", "")
+            }
+            .map(_ => (rootFolder ** "*.scala").get)
+
+          println(core)
+
+          core
+          /*
+        val svg = (generator / Compile / runMain)
+          .toTask(
+            Seq("slinky.generator.Generator", "web/svg.json", (rootFolder / "svg").getAbsolutePath, "slinky.web.svg")
+              .mkString(" ", " ", "")
+          )
+          .map(_ => (rootFolder / "svg" ** "*.scala").get)
+
+        html.zip(svg).flatMap(t => t._1.flatMap(h => t._2.map(s => h ++ s)))
+         */
+        }
+        .taskValue,
+    Compile / packageSrc / mappings ++= {
+      val base = (Compile / sourceManaged).value
+      val files = (Compile / managedSources).value
+      files.map(f => (f, f.relativeTo(base).get.getPath))
+    },
+    librarySettings,
+    crossScalaSettings
+  )
+  .dependsOn(core)
 
 lazy val core = project
   .enablePlugins(ScalaJSPlugin)
@@ -48,7 +140,7 @@ lazy val server = project
     scalaJSProjects := Seq(client),
     pipelineStages in Assets := Seq(scalaJSPipeline),
     npmAssets ++= NpmAssets
-        .ofProject(`client`)(modules => (modules / "material-components-web" ).allPaths)
+        .ofProject(`client`)(modules => (modules / "@material-ui/core").allPaths)
         .value,
     // triggers scalaJSPipeline when using compile or continuous compilation
     compile in Compile := ((compile in Compile) dependsOn scalaJSPipeline).value,
@@ -76,13 +168,14 @@ lazy val client = project
     libraryDependencies ++= Seq(
         "org.scala-js" %%% "scalajs-dom" % "1.0.0"
       ),
-    Compile / npmDependencies += "material-components-web" -> "6.0.0-canary.4b04cdb0f.0",
+    //Compile / npmDependencies += "material-components-web" -> "6.0.0-canary.4b04cdb0f.0",
     Compile / npmDependencies += "react" -> "16.12.0",
-    Compile / npmDependencies += "react-dom" -> "16.12.0"
+    Compile / npmDependencies += "react-dom" -> "16.12.0",
+    Compile / npmDependencies += "@material-ui/core" -> "4.9.11"
   )
   .enablePlugins(ScalaJSPlugin, ScalaJSWeb, ScalaJSBundlerPlugin)
   .settings(scalacOptions := Seq("-deprecation", "-feature", "-Xfatal-warnings", "-Ymacro-annotations"))
-  .dependsOn(sharedJs, core)
+  .dependsOn(sharedJs, `material-ui`)
   .settings(
     publish := {},
     publishLocal := {}
