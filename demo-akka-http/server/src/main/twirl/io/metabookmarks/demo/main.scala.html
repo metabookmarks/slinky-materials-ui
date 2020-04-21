@@ -5,7 +5,8 @@
 <html>
   <head>
     <title>@title</title>
-    <link rel="stylesheet" href="/assets/material-components-web.min.css">
+    <link rel="stylesheet" href="/assets/npm/material-components-web.min.css">
+    <link rel="stylesheet" href="/assets/npm/material-ui-pickers.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -13,6 +14,5 @@
   <body>
    @content
    @scalajs.html.scripts("client", name => s"/assets/$name", name => getClass.getResource(s"/public/$name") != null)
-  <script src="/assets/material-components-web.min.js"></script>
   </body>
 </html>

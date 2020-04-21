@@ -1,35 +1,26 @@
-[
-  {
-    "name": "Button",
-    "props": [
-      "color : String = \"primary\"",
-      "disabled: Boolean = false"
-    ],
-    "docLines": [
-      "<span class=\"seoSummary\">The <strong>HTML <code>&lt;a&gt;</code> element</strong> (or <em>anchor</em> element) creates a hyperlink to other web pages, files, locations within the same page, email addresses, or any other URL.</span>"
-    ]
-  },
-  {
-    "name": "CircularProgress",
-    "props": [
-      "color: String = \"primary\""
-    ],
-    "docLines": [
-      "<span class=\"seoSummary\">The <strong>HTML <code>&lt;a&gt;</code> element</strong> (or <em>anchor</em> element) creates a hyperlink to other web pages, files, locations within the same page, email addresses, or any other URL.</span>"
-    ]
-  },
-  {
-    "name": "KeyboardDatePicker",
-    "props" : [
-      "disableToolbar : Boolean = false",
-      "variant: String = \"inline\"",
-          "format: String = \"MM/dd/yyyy\"",
-          "margin: String = \"normal\"",
-          "id: Option[String] = Some(\"None\")",
-          "label: Option[String] = Some(\"None\")",
-          "value: String",
-          "onChange: Option[SyntheticMouseEvent[HTMLSpanElement]=>Unit] = None",
-          "KeyboardButtonProps: Option[String] = Some(\"{}\")"
-    ]
-  }
-]
+{
+  "name": "core",
+  "pkg": "slinky.materialui",
+  "npm": "@material-ui/core",
+  "elements": [
+    {
+      "name": "Button",
+      "props": [
+        "color : String = \"primary\"",
+        "disabled: Boolean = false"
+      ],
+      "docLines": [
+        "<span class=\"seoSummary\">The <strong>HTML <code>&lt;a&gt;</code> element</strong> (or <em>anchor</em> element) creates a hyperlink to other web pages, files, locations within the same page, email addresses, or any other URL.</span>"
+      ]
+    },
+    {
+      "name": "CircularProgress",
+      "props": [
+        "color: String = \"primary\""
+      ],
+      "docLines": [
+        "<span class=\"seoSummary\">The <strong>HTML <code>&lt;a&gt;</code> element</strong> (or <em>anchor</em> element) creates a hyperlink to other web pages, files, locations within the same page, email addresses, or any other URL.</span>"
+      ]
+    }
+  ]
+}

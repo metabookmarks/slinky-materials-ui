@@ -1,0 +1,30 @@
+{
+  "name": "pickers",
+  "pkg": "slinky.materialui",
+  "npm": "@material-ui/pickers",
+  "imports" :[
+
+  ],
+  "elements": [
+    {
+      "name": "KeyboardDatePicker",
+      "props": [
+        "disableToolbar : Boolean = false",
+        "variant: String = \"inline\"",
+        "format: String = \"MM/dd/yyyy\"",
+        "margin: String = \"normal\"",
+        "id: Option[String] = Some(\"None\")",
+        "label: String",
+        "value: String",
+        "onChange: String=>Unit",
+        "KeyboardButtonProps: String = \"{}\""
+      ]
+    },
+    {
+      "name": "MuiPickersUtilsProvider",
+      "props": [
+        "utils: js.Object"
+      ]
+    }
+  ]
+}

@@ -1,6 +1,5 @@
-enablePlugins(ScalaJSPlugin)
+//enablePlugins(ScalaJSPlugin)
 
+//libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.0.0"
 
-libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.8"
-
-scalacOptions -= "-Xfatal-warnings"
+//scalacOptions -= "-Xfatal-warnings"
