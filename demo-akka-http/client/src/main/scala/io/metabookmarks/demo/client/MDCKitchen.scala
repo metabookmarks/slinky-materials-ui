@@ -26,12 +26,27 @@ import scala.scalajs.js.annotation.JSImport
 import scala.scalajs.js.annotation.JSGlobal
 import scala.scalajs.js.annotation.JSGlobalScope
 import slinky.web.svg.format
+import slinky.core.facade.React
+import slinky.core.facade.Hooks._
+import slinky.core.FunctionalComponent
 
 object MDCKitchen {
 
   @js.native
   @JSImport("@date-io/date-fns", JSImport.Default)
   object DateFnsUtils extends js.Object
+  @react object MyComponent {
+    case class Props(date: js.Date)
+
+    val component = FunctionalComponent[Props] { props =>
+      val (date, setDate) = useState(props.date)
+      MuiPickersUtilsProvider(utils = DateFnsUtils)(
+        Grid(
+          KeyboardDatePicker(value = date, format = "MM/dd/yyyy", label = "day", onChange = setDate)
+        )
+      )
+    }
+  }
 
   def main(args: Array[String]): Unit =
 //    println(s"=========> ${Globals.DateFnsUtils}")
@@ -46,12 +61,7 @@ object MDCKitchen {
             "Chips" icon "widgets" content ChipsDemo(),
             "Progress" icon "refresh" content CircularProgress(),
             "Dialog" icon "widgets" content DialogDemo(name = "zozo"),
-            "Date Picker" icon "widgets" content MuiPickersUtilsProvider(DateFnsUtils)(
-              KeyboardDatePicker(value = "03/22/1971",
-                                 format = "MM/dd/yyyy",
-                                 label = "day",
-                                 onChange = str => println(str))
-            )
+            "Date Picker" icon "widgets" content MyComponent(date = new js.Date(1971, 3, 22))
           ),
           Some(
             //  Button(color = "secondary", disabled = true)("Default button")

@@ -3,7 +3,8 @@
   "pkg": "slinky.materialui",
   "npm": "@material-ui/pickers",
   "imports" :[
-
+     "java.util.Date",
+     "slinky.core.facade.SetStateHookCallback"
   ],
   "elements": [
     {
@@ -15,9 +16,9 @@
         "margin: String = \"normal\"",
         "id: Option[String] = Some(\"None\")",
         "label: String",
-        "value: String",
-        "onChange: String=>Unit",
-        "KeyboardButtonProps: String = \"{}\""
+        "value: js.Date",
+        "onChange: js.Date => Unit",
+        "KeyboardButtonProps: js.Object = js.Object()"
       ]
     },
     {

@@ -1,5 +1,8 @@
 enablePlugins(ScalaJSPlugin)
 
+val slinkySourceMap =
+  "-P:scalajs:mapSourceURI:file:/Users/chelebithil/projects/shadaj/slinky->https://raw.githubusercontent.com/shadaj/slinky/v0.6.5/slinky/"
+
 val scala212 = "2.12.10"
 val scala213 = "2.13.1"
 
@@ -40,11 +43,7 @@ lazy val librarySettings = Seq(
       s"v$origVersion"
     }
     Seq(
-      {
-        val a = "file:/Users/oliviernouguier/projects/shadaj/slinky"
-        val g = "https://raw.githubusercontent.com/shadaj/slinky"
-        s"-P:scalajs:mapSourceURI:$a->$g/v0.6.5/slinky/"
-      }, {
+      slinkySourceMap, {
         val a = baseDirectory.value.toURI
         val g = "https://raw.githubusercontent.com/metabookmarks/slinky-materials-ui"
         s"-P:scalajs:mapSourceURI:$a->$g/$githubVersion/${baseDirectory.value.getName}/"
@@ -196,7 +195,7 @@ lazy val server = project
     compile in Compile := ((compile in Compile) dependsOn scalaJSPipeline).value,
     libraryDependencies ++= Seq(
         "com.typesafe.akka" %% "akka-http" % "10.1.11",
-        "com.typesafe.akka" %% "akka-stream" % "2.6.3",
+        "com.typesafe.akka" %% "akka-stream" % "2.6.4",
         "com.vmunier" %% "scalajs-scripts" % "1.1.4"
       ),
     WebKeys.packagePrefix in Assets := "public/",
@@ -216,10 +215,12 @@ lazy val client = project
   .settings(commonSettings)
   .settings(scalacOptions := Seq("-deprecation", "-feature", "-Xfatal-warnings", "-Ymacro-annotations"))
   .settings(
-    scalaJSUseMainModuleInitializer := true,
+    scalaJSUseMainModuleInitializer := true
   )
   .dependsOn(sharedJs, `material-ui`)
-  //   .settings(
+  .settings(
+    scalacOptions += slinkySourceMap
+  )
   //     webpackBundlingMode in fastOptJS := BundlingMode.LibraryOnly(),
   //   webpackConfigFile in fastOptJS := Some(baseDirectory.value / "dev.config.js")
   // )
