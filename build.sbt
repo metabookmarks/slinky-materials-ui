@@ -7,6 +7,9 @@ val scala212 = "2.12.10"
 val scala213 = "2.13.1"
 
 name := "Scala.js Slinky Material UI"
+
+val slinkyVersion = "0.6.5"
+
 inThisBuild(
   List(
     scalaVersion := scala213,
@@ -21,7 +24,6 @@ lazy val slinkyMaterial = project
   .aggregate(
     generator,
     `material-ui`,
-    core,
     server,
     client,
     sharedJs,
@@ -31,8 +33,6 @@ lazy val slinkyMaterial = project
     publish := {},
     publishLocal := {}
   )
-
-val slinkyVersion = "0.6.5"
 
 lazy val librarySettings = Seq(
   scalacOptions ++= {
@@ -80,10 +80,22 @@ lazy val crossScalaSettings = Seq(
 )
 
 lazy val generator = project
+  .settings(
+    publish := {},
+    publishLocal := {}
+  )
 
 lazy val `material-ui` = project
   .in(file("material-ui"))
   .enablePlugins(ScalaJSBundlerPlugin)
+  .settings(
+    libraryDependencies ++= Seq(
+        "org.scala-js" %%% "scalajs-dom" % "1.0.0",
+        "me.shadaj" %%% "slinky-core" % slinkyVersion, // core React functionality, no React DOM
+        "me.shadaj" %%% "slinky-web" % slinkyVersion
+      ),
+    normalizedName := "slinky-material-ui"
+  )
   .settings(
     Compile / sourceGenerators += Def
         .taskDyn[Seq[File]] {
@@ -156,19 +168,6 @@ lazy val `material-ui` = project
     Compile / npmDevDependencies  +=  "css-loader" -> "0.28.11",
     Compile / npmDevDependencies  += "mini-css-extract-plugin" -> "0.4.0"
    */
-  )
-  .dependsOn(core)
-
-lazy val core = project
-  .enablePlugins(ScalaJSPlugin)
-  .in(file("core"))
-  .settings(
-    libraryDependencies ++= Seq(
-        "org.scala-js" %%% "scalajs-dom" % "1.0.0",
-        "me.shadaj" %%% "slinky-core" % slinkyVersion, // core React functionality, no React DOM
-        "me.shadaj" %%% "slinky-web" % slinkyVersion
-      ),
-    normalizedName := "slinky-material-ui"
   )
 
 lazy val server = project
