@@ -4,6 +4,21 @@
   "npm": "@material-ui/core",
   "elements": [
     {
+      "name": "Breadcrumbs",
+      "props": [
+        "`aria-label`: String = \"breadcrumb\"",
+        "separator: String = \"/\""
+      ]
+    },
+    {
+      "name": "Link",
+      "props": [
+        "color: String = \"inherit\"",
+        "href: String",
+        "onClick: Event => Unit"
+      ]
+    },
+    {
       "name": "Button",
       "props": [
         "color : String = \"primary\"",
@@ -29,6 +44,5 @@
         "justify: String = \"space-around\""
       ]
     }
-
   ]
 }

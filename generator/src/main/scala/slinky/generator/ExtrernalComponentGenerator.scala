@@ -56,7 +56,7 @@ object ExtrernalComponentGenerator extends App {
 
   def processElements(module: Module, outputFolder: File): Unit = {
     if (!outputFolder.mkdirs())
-      logger.warn("sys.exit(0)")
+      logger.debug("sys.exit(0)")
 
     val output = new PrintWriter(outputFolder.toPath.resolve(s"${module.name}.scala").toFile())
 
@@ -65,7 +65,7 @@ import scalajs.js
 import scala.scalajs.js.annotation.JSImport
 import slinky.core.annotations.react
 import slinky.core.ExternalComponent
-import org.scalajs.dom.raw.HTMLSpanElement
+import org.scalajs.dom.raw._
 import slinky.web.SyntheticMouseEvent
 """)
     module.imports.foreach(imports => imports.foreach(imp => output.println(s"import $imp")))
