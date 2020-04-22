@@ -12,39 +12,53 @@ import io.circe.jawn._
 
 import slinky.generator.model.{Element, Module}
 import scala.io.Source
+import scopt._
+import org.slf4j.LoggerFactory
+
+case class Config(output: File = new File("target/"), modules: List[File] = List.empty)
 
 object ExtrernalComponentGenerator extends App {
 
-  val zozo = new PrintWriter(new File("/tmp/zozogen.txt"))
+  val logger = LoggerFactory.getLogger(getClass())
 
-  def zb(str: String): Unit = {
-    zozo.append(s"$str\n")
-    zozo.flush()
-
+  val parser = new scopt.OptionParser[Config]("scopt") {
+    head("scopt", "3.x")
+    opt[File]("output")
+      .action((output, config) =>
+        config
+          .copy(output = output)
+      )
+      .required()
+    help("help")
+    arg[File]("modules")
+      .unbounded()
+      .action((module, config) =>
+        config
+          .copy(modules = config.modules :+ module)
+      )
   }
 
-  zb("PWD: " + System.getProperty("user.dir"))
+  parser.parse(args, Config()) match {
+    case None =>
+      logger.error(parser.usage)
+    case Some(config) =>
+      logger.info(s"output: ${config.output}")
+      config.modules.foreach { module =>
+        logger.info(s"\t* $module")
 
-  val components :: out :: Nil = args.toList
-
-  val componentsFile = Paths.get(URI.create(s"file:$components"))
-  val outputFolder = Paths.get(URI.create(s"file:$out"))
-
-  zb(components)
-  zb(out)
-
-  decodeFile[Module](componentsFile.toFile()) match {
-    case Left(e) => zb(e.getMessage())
-    case Right(module) =>
-      processElements(module)
+        decodeFile[Module](module) match {
+          case Left(e) => logger.error("TODO Module info", e.getMessage())
+          case Right(module) =>
+            processElements(module, config.output)
+        }
+      }
   }
 
-  def processElements(module: Module): Unit = {
-    val outFolder = new File(out)
-    if (outFolder.mkdirs())
-      zb("sys.exit(0)")
+  def processElements(module: Module, outputFolder: File): Unit = {
+    if (!outputFolder.mkdirs())
+      logger.warn("sys.exit(0)")
 
-    val output = new PrintWriter(outputFolder.resolve(s"${module.name}.scala").toFile())
+    val output = new PrintWriter(outputFolder.toPath.resolve(s"${module.name}.scala").toFile())
 
     output.println(s"""package ${module.pkg}
 import scalajs.js
@@ -94,7 +108,7 @@ object ${module.dom} extends js.Object {""")
           val ${element.name}: js.Function = ${module.dom}.${element.name}""")
         case Some("class") =>
           output.println(s"val ${element.name} = ${module.dom}.${element.name}")
-        case Some(wtf) => zb(wtf)
+        case Some(wtf) => logger.warn(s"WTF:$wtf")
       }
     }
     output.println("}")

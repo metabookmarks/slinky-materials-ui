@@ -81,6 +81,10 @@ lazy val crossScalaSettings = Seq(
 
 lazy val generator = project
   .settings(
+    libraryDependencies ++= Seq("com.github.scopt" %% "scopt" % "3.7.1",
+    "ch.qos.logback"        % "logback-classic" % "1.2.3"
+  ))
+  .settings(
     publish := {},
     publishLocal := {}
   )
@@ -105,18 +109,22 @@ lazy val `material-ui` = project
 
           val core = (generator / Compile / runMain)
             .toTask {
-              Seq("slinky.generator.ExtrernalComponentGenerator",
-                  (baseDir / "core.json").getAbsolutePath,
-                  (rootFolder.getAbsolutePath))
-                .mkString(" ", " ", "")
+              (Seq("slinky.generator.ExtrernalComponentGenerator",
+                  "--output",
+                  (rootFolder.getAbsolutePath)
+                  ) ++ (baseDir  *  "*.json").get.toList
+
+                              )                .mkString(" ", " ", "")
             }
             .map(_ => (rootFolder ** "*.scala").get)
-
+/*
           val pickers = (generator / Compile / runMain)
             .toTask {
               Seq("slinky.generator.ExtrernalComponentGenerator",
-                  (baseDir / "pickers.json").getAbsolutePath,
-                  (rootFolder.getAbsolutePath))
+              "--output",
+                  (rootFolder.getAbsolutePath),
+                  (baseDir / "pickers.json").getAbsolutePath
+                  )
                 .mkString(" ", " ", "")
             }
             .map(_ => (rootFolder ** "*.scala").get)
@@ -124,8 +132,9 @@ lazy val `material-ui` = project
           val date = (generator / Compile / runMain)
             .toTask {
               Seq("slinky.generator.ExtrernalComponentGenerator",
-                  (baseDir / "date.json").getAbsolutePath,
-                  (rootFolder.getAbsolutePath))
+              "--output",
+                  (rootFolder.getAbsolutePath),
+                  (baseDir / "date.json").getAbsolutePath)
                 .mkString(" ", " ", "")
             }
             .map(_ => (rootFolder ** "*.scala").get)
@@ -138,6 +147,8 @@ lazy val `material-ui` = project
                   pickersTask.flatMap(pickersFiles => dateTask.map(files => files ++ pickersFiles ++ coreFiles))
                 }
             }
+            */
+            core
         }
         .taskValue,
     Compile / packageSrc / mappings ++= {
