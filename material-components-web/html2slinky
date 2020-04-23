@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+
+use strict;
+
+our @buffer = ();
+
+while(<>){
+  chomp;
+  flush() && next if ($_ eq "");
+  push @buffer, $_;
+}
+
+sub flush {
+ foreach (@buffer){
+     s/\<(\w+)/$1(/;
+     s/class="/className := "/g;
+     s/(\w+)="([^"]+)"/$1 := "$2"/g;
+     s/"\s/", /g;
+     s/aria-(\w+)/aria - "$1"/g;
+     s/"\>/")("/g;
+     s/(\<\/\w+\>)/\")/g; 
+     s/\(""\)//g;
+     s/"$//;
+     s/\/\>$//;
+     s/^(\s*)"\)/$1)/;
+     print $_, "\n"
+ }
+ @buffer = ();
+ 1;
+}

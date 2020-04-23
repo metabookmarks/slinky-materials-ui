@@ -1,0 +1,11 @@
+{
+  "name": "date",
+  "parent": "slinky.materialui",
+  "npm": "@date-io/date-fns",
+  "objects": [
+    "DateFnsUtils"
+  ],
+  "elements": [
+    
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "icons",
+  "parent": "slinky.materialui",
+  "npm": "@material-ui/icons",
+  "imports": [
+    "slinky.core._",
+    "slinky.core.facade._",
+    "slinky.web.html._"
+  ],
+  "objects": [
+    "DeleteIcon"
+  ],
+  "elements": [
+    {
+      "name": "Icon",
+      "props": [
+        "color: String = \"inherit\"",
+        "component: String = \"span\"",
+        "fontSize: String = \"default\""
+      ]
+    }
+  ]
+}

@@ -14,6 +14,14 @@ class WebService() extends Directives {
         }
       }
     } ~
+    path("mdc") {
+      get {
+        complete {
+          io.metabookmarks.demo.html.mdc.render("MDC")
+        }
+      }
+
+    } ~
     pathPrefix("assets" / Remaining) { file =>
       // optionally compresses the response with Gzip or Deflate
       // if the client accepts compressed responses
