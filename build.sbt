@@ -112,6 +112,8 @@ lazy val `material-components-web` = project.in(file("material-components-web"))
           val core = (generator / Compile / runMain)
             .toTask {
               (Seq("slinky.generator.mdc.MDCGenerator",
+                  "--target",
+                  target.value,
                   "--output",
                   (rootFolder.getAbsolutePath)
                   ) ++ (baseDir  *  "*.json").get.toList
@@ -158,6 +160,8 @@ lazy val `material-ui` = project
           (generator / Compile / runMain)
             .toTask {
               (Seq("slinky.generator.ExtrernalComponentGenerator",
+                  "--target",
+                  target.value,
                   "--output",
                   (rootFolder.getAbsolutePath)
                   ) ++ (baseDir  *  "*.json").get.toList
@@ -183,7 +187,7 @@ lazy val `material-ui` = project
     Compile / npmDependencies += "react" -> "16.13.1",
     Compile / npmDependencies += "react-dom" -> "16.13.1",
     Compile / npmDependencies += "@material-ui/icons" -> "4.9.1",
-    Compile / npmDependencies += "@material-ui/core" -> "4.9.11",
+    Compile / npmDependencies += "@material-ui/core" -> "4.9.12",
     Compile / npmDependencies += "@material-ui/pickers" -> "3.2.10",
     Compile / npmDependencies += "@date-io/core" -> "1.3.6",
     Compile / npmDependencies += "@date-io/date-fns" -> "1.3.13",

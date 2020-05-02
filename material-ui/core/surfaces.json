@@ -1,0 +1,23 @@
+[
+    {
+        "name": "Card",
+        "props": [
+            "raised: Boolean = false"
+        ]
+    },
+    {
+        "name": "CardActionArea"
+    },
+    {
+        "name": "CardActions",
+        "props": [
+            "disableSpacing: Boolean = false"
+        ]
+    },
+    {
+        "name": "CardContent",
+        "props": [
+            "component: String = \"div\""
+        ]
+    }
+]

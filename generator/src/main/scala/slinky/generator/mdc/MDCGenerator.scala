@@ -37,6 +37,10 @@ object MDCGenerator extends App with Utils {
       }
   }
 
+}
+
+class MDCGenerator extends Utils {
+
   def processModule(module: Module, outputFolder: File): Unit = {
     if (!outputFolder.mkdirs())
       logger.debug("sys.exit(0)")

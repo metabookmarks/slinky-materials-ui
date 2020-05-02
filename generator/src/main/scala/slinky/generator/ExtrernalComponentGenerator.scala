@@ -17,7 +17,12 @@ import org.slf4j.LoggerFactory
 import slinky.generator.model.CustomAttribute
 import io.circe.ParsingFailure
 import io.circe.DecodingFailure
-
+import scala.jdk.StreamConverters._
+import org.apache.commons.codec.cli.Digest
+import org.apache.commons.codec.digest.DigestUtils
+import java.io.FileInputStream
+import java.nio.file.Path
+import scala.util.Using
 object ExtrernalComponentGenerator extends App with Utils {
 
   parser.parse(args, Config()) match {
@@ -25,10 +30,10 @@ object ExtrernalComponentGenerator extends App with Utils {
       logger.error(parser.usage)
     case Some(config) =>
       logger.info(s"output: ${config.output}")
-      config.modules.foreach { module =>
-        logger.info(s"\t* $module")
+      config.modules.foreach { moduleFile =>
+        logger.debug(s"\t* ${moduleFile.getName()}")
 
-        decodeFile[Module](module) match {
+        decodeFile[Module](moduleFile) match {
 
           case Left(e) =>
             e match {
@@ -39,18 +44,70 @@ object ExtrernalComponentGenerator extends App with Utils {
 
             }
           case Right(module) =>
-            processModule(module, new File(config.output, module.name))
+            val generator = new ExtrernalComponentGenerator(config.target)
+            generator.processModule(moduleFile, module, new File(config.output, module.name))
         }
       }
   }
+}
 
-  def processModule(module: Module, outputFolder: File): Unit = {
+class ExtrernalComponentGenerator(target: File) extends Utils {
+
+  def digestFile(module: Module, file: File): File = new File(target, s"${module.name}-${file.getName()}.sha256")
+
+  def needProcessing(module: Module, file: File): Boolean =
+    if (digestFile(module, file).exists) {
+      val old = Source.fromFile(digestFile(module, file)).getLines().mkString
+
+      if (DigestUtils
+            .sha256Hex(new FileInputStream(file))
+            .contentEquals(old)) {
+        logger.debug(s"${file.getName()} unchanged")
+        false
+      } else {
+        logger.info(s" 🎉 ${file.getName()}")
+        true
+      }
+    } else {
+      logger.info(s" ✨ ${file.getName()}")
+      true
+    }
+
+  def writeDigest(module: Module, file: File): Unit =
+    Using.resource(new PrintWriter(digestFile(module, file))) { printer =>
+      printer.write(
+        DigestUtils
+          .sha256Hex(new FileInputStream(file))
+      )
+    }
+
+  def processModule(moduleFile: File, module: Module, outputFolder: File): Unit = {
     if (!outputFolder.mkdirs())
       logger.debug("sys.exit(0)")
 
-    writeModule(module, outputFolder)
+    if (needProcessing(module, moduleFile)) {
+      writeModule(module, outputFolder)
+      module.elements.foreach(element => processElement(module, element, outputFolder))
+      writeDigest(module, moduleFile)
+    }
 
-    module.elements.foreach(element => processElement(module, element, outputFolder))
+    val moduleFolder = moduleFile.toPath().resolveSibling(module.name)
+    if (Files.exists(moduleFolder)) {
+      Files
+        .list(moduleFolder)
+        .toScala(LazyList)
+        .filter(file => needProcessing(module, file.toFile()))
+        .foreach { elementsFile =>
+          val elements = decodeFile[List[Element]](elementsFile.toFile())
+          elements.foreach(elements =>
+            elements.foreach { element =>
+              processElement(module, element, outputFolder)
+              writeDigest(module, elementsFile.toFile())
+            }
+          )
+
+        }
+    }
 
   }
 

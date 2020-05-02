@@ -4,13 +4,21 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.PrintWriter
 
-case class Config(output: File = new File("target/"), modules: List[File] = List.empty)
+case class Config(target: File = new File("target/"),
+                  output: File = new File("target/"),
+                  modules: List[File] = List.empty)
 
 trait Utils {
   val logger = LoggerFactory.getLogger(getClass())
 
   val parser = new scopt.OptionParser[Config]("scopt") {
     head("scopt", "3.x")
+    opt[File]("target")
+      .action((target, config) =>
+        config
+          .copy(target = target)
+      )
+      .required()
     opt[File]("output")
       .action((output, config) =>
         config
