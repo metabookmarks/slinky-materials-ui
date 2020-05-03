@@ -2,6 +2,9 @@
     {
         "name": "Card",
         "props": [
+            "classes: js.UndefOr[js.Object] = js.undefined",
+            "elevation: Int = 1",
+            "square: Boolean = false",
             "raised: Boolean = false"
         ]
     },
@@ -19,5 +22,29 @@
         "props": [
             "component: String = \"div\""
         ]
+    },
+    {
+        "name": "CardHeader",
+        "props": [
+            "component: String = \"div\"",
+            "action: ReactElement",
+            "avatar: ReactElement"
+        ]
+    },
+    {
+        "name": "CardMedia",
+        "props": [
+            "component: String = \"div\"",
+            "image: String = \"\"",
+            "src: String = \"\"",
+            "title: String"
+
+        ]
+    },
+    {
+        "name": "Collapse"
+    },
+    {
+        "name": "Paper"
     }
 ]

@@ -36,6 +36,7 @@ import io.metabookmarks.demo.client.mdc.ButtonsDemo
 import io.metabookmarks.demo.client.mdc.ProgressDemo
 import io.metabookmarks.demo.client.DatePickerDemo
 import io.metabookmarks.demo.client.SwitchDemo
+import io.metabookmarks.demo.client.surfaces.CardDemo
 
 object MDCKitchen {
 
@@ -57,8 +58,7 @@ object MDCKitchen {
             "Date Picker" icon "widgets" content DatePickerDemo(date = new js.Date(1971, 3, 22))
           ),
           Some(
-            //SwitchDemo(ok1 = true, ok2 = false)
-            DialogDemo()
+            CardDemo()
           )
         ),
         container

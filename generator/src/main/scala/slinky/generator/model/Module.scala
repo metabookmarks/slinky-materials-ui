@@ -11,9 +11,23 @@ case class Module(name: String,
   def pkg = s"$parent.$name"
 }
 case class CustomAttribute(name: String, symbol: Option[String], `type`: String)
-case class Element(name: String, imports: Option[List[String]], inherits: Option[String], props: Option[List[String]]) {
+case class Element(name: String, wrap: Option[String], imports: Option[List[String]], props: Option[List[String]]) {
+
   private def ucFirst(str: String) = str.take(1).toUpperCase().appendedAll(str.drop(1))
+
   def dom = s"${name}DOM"
+
+  def baseClass: String = {
+    val noProps = if (props.isEmpty) "NoProps" else ""
+    val withAttrs = wrap
+      .map {
+        case "" => ""
+        case a => s"[$a.tag.type]"
+      }
+      .map(a => s"WithAttributes$a")
+      .getOrElse("")
+    s"ExternalComponent$noProps$withAttrs"
+  }
 }
 
 trait EscapedValues {

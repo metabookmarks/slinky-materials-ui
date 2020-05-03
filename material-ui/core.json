@@ -95,7 +95,7 @@
     },
     {
       "name": "Box",
-      "inherits": "ExternalComponentNoPropsWithAttributes"
+      "wrap": ""
     },
     {
       "name": "Breadcrumbs",
@@ -106,18 +106,18 @@
     },
     {
       "name": "Container",
-      "inherits": "ExternalComponentNoPropsWithAttributes"
+      "wrap": ""
     },
     {
       "name": "Link",
-      "inherits": "ExternalComponentWithAttributes[a.tag.type]",
+      "wrap": "a",
       "props": [
         "color: String = \"inherit\""
       ]
     },
     {
       "name": "Button",
-      "inherits": "ExternalComponentWithAttributes[a.tag.type]",
+      "wrap": "a",
       "props": [
         "color : String = \"primary\"",
         "disabled: Boolean = false",
@@ -166,12 +166,10 @@
       ]
     },
     {
-      "name": "FormGroup",
-      "inherits":"ExternalComponentNoProps"
+      "name": "FormGroup"
     },
     {
       "name": "FormControlLabel",
-      "inherits":"ExternalComponent",
       "props":[
         "control: ReactElement",
         "label: String = \"\""
@@ -181,6 +179,7 @@
       "name": "Grid",
       "imports": ["Size.orBooleanWriter"],
       "props": [
+        "key: String = \"\"",
         "container: Boolean = false",
         "classes: js.UndefOr[js.Object] = js.undefined",
         "item: Boolean = false",
@@ -239,7 +238,6 @@
     },
     {
       "name": "IconButton",
-      "inherits": "ExternalComponent",
       "props": [
         "`aria-label`: String",
         "color: String = \"default\"",
@@ -270,7 +268,7 @@
     },
     {
       "name": "Switch",
-      "inherits": "ExternalComponentWithAttributes[a.tag.type]",
+      "wrap": "a",
       "props":[
         "checked: Boolean",
         "name: String",

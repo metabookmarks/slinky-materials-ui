@@ -216,25 +216,17 @@ import slinky.web.SyntheticMouseEvent
              |  val ${element.name}: js.Object = js.native
              |}""")
 
-    val inherits = element.inherits.getOrElse {
-      if (element.props.isDefined)
-        "ExternalComponent"
-      else
-        "ExternalComponentNoProps"
-    }
-
-    inherits match {
-      case "ExternalComponentNoProps" | "ExternalComponentNoPropsWithAttributes" =>
-        out(s"object ${element.name} extends ${inherits}")
-        outln(" {")
-      case inherits =>
-        out(s"@react object ${element.name} extends $inherits")
-        outln(" {")
-        element.props.foreach { props =>
-          out("  case class Props(")
-          out(props.mkString(", "))
-          outln(")")
-        }
+    if (element.props.isEmpty) {
+      out(s"object ${element.name} extends ${element.baseClass}")
+      outln(" {")
+    } else {
+      out(s"@react object ${element.name} extends ${element.baseClass}")
+      outln(" {")
+      element.props.foreach { props =>
+        out("  case class Props(")
+        out(props.mkString(", "))
+        outln(")")
+      }
     }
     outln(s"  override val component = ${element.dom}.${element.name}")
     outln("}")
