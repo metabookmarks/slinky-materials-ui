@@ -28,7 +28,7 @@ object ReactTestEvent {
     Grid(container = true, wrap = Wrap.wrap, spacing = 2)(
       (1 to 12).map(i =>
         Grid(key = s"k$i", item = true, sm = Size.`2`)(
-          Card(cla
+          Card(
             CardContent(
               Typography("iiz zizi zi ziz i ziziz izi ")
             )
