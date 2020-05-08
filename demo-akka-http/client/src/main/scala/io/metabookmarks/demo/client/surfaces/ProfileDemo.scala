@@ -12,6 +12,16 @@ import scala.scalajs.js.annotation.JSImport
 import io.metabookmarks.demo.shared.User
 import slinky.core.FunctionalComponent
 
+object ReactTestEvent {
+  @js.native
+  @JSImport("@material-ui/core", JSImport.Default)
+  object Module extends js.Any {
+    @js.native
+    object makeStyles extends js.Object
+  }
+  def makeStyles[A] = Module.makeStyles.asInstanceOf[js.Function1[js.Object, js.Function0[A]]]
+}
+
 @js.native
 trait Styles extends js.Object {
   val root: String = js.native
@@ -26,6 +36,8 @@ trait Styles extends js.Object {
 
   val component = FunctionalComponent[Props] { props =>
     val styles: Styles = useStyles()
+
+    println(styles.root)
 
     div(className := styles.root)(
       Grid(container = true, wrap = Wrap.wrap, alignItems = Align.stretch, alignContent = Align.stretch)(

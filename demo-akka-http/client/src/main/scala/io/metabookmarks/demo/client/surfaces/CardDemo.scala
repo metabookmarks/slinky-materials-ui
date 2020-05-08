@@ -9,17 +9,6 @@ import slinky.web.html._
 import slinky.materialui.core._
 import scalajs.js
 import scala.scalajs.js.annotation.JSImport
-
-object ReactTestEvent {
-  @js.native
-  @JSImport("@material-ui/core", JSImport.Default)
-  object Module extends js.Any {
-    @js.native
-    object makeStyles extends js.Object
-  }
-  def makeStyles[A] = Module.makeStyles.asInstanceOf[js.Function1[js.Object, js.Function0[A]]]
-}
-
 @react class CardDemo extends StatelessComponent {
   type Props = Unit
 
