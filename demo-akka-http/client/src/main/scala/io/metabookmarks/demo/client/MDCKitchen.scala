@@ -37,6 +37,8 @@ import io.metabookmarks.demo.client.mdc.ProgressDemo
 import io.metabookmarks.demo.client.DatePickerDemo
 import io.metabookmarks.demo.client.SwitchDemo
 import io.metabookmarks.demo.client.surfaces.CardDemo
+import io.metabookmarks.demo.shared.User
+import io.metabookmarks.demo.client.surfaces.ProfileDemo
 
 object MDCKitchen {
 
@@ -50,6 +52,7 @@ object MDCKitchen {
           items = List(
             "Home" icon "home" href "/",
             "Buttons" icon "widgets" content ButtonsDemo(),
+            "Cards" icon "dashboard" content CardDemo(),
             "Dialog" icon "dashboard" content DialogDemo(),
             //          "Chips" icon "widgets" content ChipsDemo(),
             "Breadcrumb" icon "widgets" content BreadcrumbsDemo(),
@@ -58,7 +61,15 @@ object MDCKitchen {
             "Date Picker" icon "widgets" content DatePickerDemo(date = new js.Date(1971, 3, 22))
           ),
           Some(
-            CardDemo()
+            ProfileDemo(
+              User(
+                email = "olivier.nouguier@gmail.com",
+                firstName = Some("Olivier"),
+                lastName = Some("NOUGUIER"),
+                avatarURL = Some("https://s.gravatar.com/avatar/b2484ef33a94ebdcd47de7d3dff41515?s=80"),
+                profiles = Map.empty
+              )
+            )
           )
         ),
         container

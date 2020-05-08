@@ -224,7 +224,7 @@ import slinky.web.SyntheticMouseEvent
       outln(" {")
       element.props.foreach { props =>
         out("  case class Props(")
-        out(props.mkString(", "))
+        out(props.mkString(",\n    "))
         outln(")")
       }
     }

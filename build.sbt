@@ -5,8 +5,7 @@ enablePlugins(ScalaJSPlugin)
 val slinkySourceMap =
   "-P:scalajs:mapSourceURI:file:/Users/chelebithil/projects/shadaj/slinky->https://raw.githubusercontent.com/shadaj/slinky/v0.6.5/slinky/"
 
-val scala212 = "2.12.10"
-val scala213 = "2.13.1"
+val scala213 = "2.13.2"
 
 name := "Scala.js Slinky Material UI"
 
@@ -65,7 +64,7 @@ lazy val librarySettings = Seq(
 )
 
 lazy val crossScalaSettings = Seq(
-  crossScalaVersions := Seq(scala212, scala213),
+  crossScalaVersions := Seq(scala213),
   Compile / unmanagedSourceDirectories += {
     val sourceDir = (Compile / sourceDirectory).value
     CrossVersion.partialVersion(scalaVersion.value) match {
