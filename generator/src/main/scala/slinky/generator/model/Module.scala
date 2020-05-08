@@ -4,11 +4,23 @@ case class Module(name: String,
                   parent: String,
                   npm: String,
                   enums: Option[List[Enum]],
-                  elements: List[Element],
                   objects: Option[List[String]],
+                  functions: Option[List[Function]],
                   imports: Option[List[String]],
-                  customAttributes: Option[List[CustomAttribute]]) {
+                  customAttributes: Option[List[CustomAttribute]],
+                  elements: List[Element]) {
+
   def pkg = s"$parent.$name"
+
+  def mod = s"${name}Module"
+
+}
+
+case class Function(name: String, args: List[String], partials: Option[Int]) {
+
+  def scala(mod: String) =
+    s"def $name[A] = $mod.$name.asInstanceOf[js.Function${args.size}[${args.map(_ => "js.Object").mkString(", ")}, js.Function0[A]]]"
+
 }
 case class CustomAttribute(name: String, symbol: Option[String], `type`: String)
 case class Element(name: String, wrap: Option[String], imports: Option[List[String]], props: Option[List[String]]) {

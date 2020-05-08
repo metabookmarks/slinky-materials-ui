@@ -171,11 +171,49 @@ class ExtrernalComponentGenerator(target: File) extends Utils {
 
     module.objects.foreach(objects =>
       objects.foreach { obj =>
-        outln("@js.native")
-        outln(s"""@JSImport("${module.npm}", JSImport.Default)""")
+        outln("  @js.native")
+        outln(s"""  @JSImport("${module.npm}", JSImport.Default)""")
         outln(s"  object $obj extends js.Object")
       }
     )
+
+    module.functions.foreach { functions =>
+      outln("  @js.native")
+      outln(s"""  @JSImport("${module.npm}", JSImport.Default)""")
+      outln(s"  object ${module.mod} extends js.Any {")
+
+      functions.foreach { function =>
+        outln(s"    @js.native")
+        outln(s"    object ${function.name} extends js.Object")
+      }
+
+      outln("  }")
+
+      functions.foreach { function =>
+        outln(s"  ${function.scala(module.mod)}")
+        function.partials.foreach { partials =>
+          outln(s"  //Partial application $partials")
+          //    def mk[A](css: js.Dynamic) =  makeStyles[A]((theme: js.Object) => css)
+
+          outln(
+            s"  def ${function.name}[A](param: js.Dynamic): js.Function0[A] = ${function.name}[A]((param: js.Object) => param)"
+          )
+          for (n <- 2 to partials) {
+            //def mk[A](t1: (String, js.Dynamic)) = makeStyles[A]((theme: js.Object) => js.Dynamic.literal(t1._1 -> t1._2))
+            val params = expand(n)(i => s"p$i: (String, js.Dynamic)")
+            val jsParams = expand(n)(i => s"p$i._1 -> p$i._2")
+            outln(
+              s"  def ${function.name}[A]( ${params}  ): js.Function0[A] =\n" +
+              s"    ${function.name}[A]((param: js.Object) => js.Dynamic.literal(${jsParams}))"
+            )
+          }
+
+        }
+
+      }
+
+    }
+
     module.customAttributes.foreach { attributes =>
       attributes.foreach {
         case CustomAttribute(name, maybeSymbol, _type) =>
@@ -188,6 +226,8 @@ class ExtrernalComponentGenerator(target: File) extends Utils {
 
     output.close()
   }
+
+  def expand(n: Int)(f: Int => String) = (1 to n).map(i => f(i)).mkString(", ")
 
   def processElement(module: Module, element: Element, outputFolder: File): Unit = {
 

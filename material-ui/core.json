@@ -84,6 +84,13 @@
       "values":["nowrap", "wrap", "wrap-reverse"]
     }
   ],
+  "functions": [
+    {
+      "name": "makeStyles",
+      "args": ["rule"],
+      "partials": 3
+    }
+  ],
   "elements": [
     {
       "name": "AppBar",
