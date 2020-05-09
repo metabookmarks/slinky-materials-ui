@@ -56,7 +56,7 @@ object MDCKitchen {
             "Buttons" icon "widgets" content ButtonsDemo(),
             "Cards" icon "dashboard" content CardDemo(),
             "Dialog" icon "dashboard" content DialogDemo(),
-            //          "Chips" icon "widgets" content ChipsDemo(),
+            "Chips" icon "widgets" content ChipsDemo(),
             "Breadcrumb" icon "widgets" content BreadcrumbsDemo(),
             "Progress" icon "refresh" content ProgressDemo(),
             "Dialog" icon "widgets" content DialogDemo(),
