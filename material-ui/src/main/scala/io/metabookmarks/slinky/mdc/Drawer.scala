@@ -14,7 +14,7 @@ import org.scalajs.dom.raw.Element
 
 @react class Drawer extends Component {
 
-  case class Props(title: String, items: List[MenuItem], welcome: ReactElement = None)
+  case class Props(title: String, subTitle: String, items: List[MenuItem], welcome: ReactElement = None)
 
   case class State(open: Boolean, section: String, content: ReactElement)
 
@@ -43,7 +43,7 @@ import org.scalajs.dom.raw.Element
       aside(className := s"mdc-drawer mdc-drawer--dismissible $openClassName")(
         div(className := "mdc-drawer__header")(
           h3(className := "mdc-drawer__title")(props.title),
-          h6(className := "mdc-drawer__subtitle")("user.email")
+          h6(className := "mdc-drawer__subtitle")(props.subTitle)
         ),
         div(className := "mdc-drawer__content")(
           div(className := "mdc-list-group")(

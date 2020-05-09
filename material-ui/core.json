@@ -3,6 +3,7 @@
   "parent": "slinky.materialui",
   "npm": "@material-ui/core",
   "imports": [
+    "java.{util => ju}",
     "org.scalajs.dom.html",
     "slinky.core._",
     "slinky.core.facade._",

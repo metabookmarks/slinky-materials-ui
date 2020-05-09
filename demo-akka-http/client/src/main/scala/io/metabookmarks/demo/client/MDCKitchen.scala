@@ -39,6 +39,7 @@ import io.metabookmarks.demo.client.SwitchDemo
 import io.metabookmarks.demo.client.surfaces.CardDemo
 import io.metabookmarks.demo.shared.User
 import io.metabookmarks.demo.client.surfaces.ProfileDemo
+import io.metabookmarks.demo.shared.Profile
 
 object MDCKitchen {
 
@@ -48,7 +49,8 @@ object MDCKitchen {
       import Drawer._
       ReactDOM.render(
         Drawer(
-          title = "MyApp",
+          title = "Material UI",
+          subTitle = "0.1",
           items = List(
             "Home" icon "home" href "/",
             "Buttons" icon "widgets" content ButtonsDemo(),
@@ -67,7 +69,16 @@ object MDCKitchen {
                 firstName = Some("Olivier"),
                 lastName = Some("NOUGUIER"),
                 avatarURL = Some("https://s.gravatar.com/avatar/b2484ef33a94ebdcd47de7d3dff41515?s=80"),
-                profiles = Map.empty
+                profiles = Map(
+                  "twitter" -> Profile(
+                    providerKey = "IIII",
+                    fullName = Some("zozo")
+                  ),
+                  "google" -> Profile(
+                    providerKey = "IIII",
+                    fullName = Some("zozo")
+                  )
+                )
               )
             )
           )

@@ -256,6 +256,7 @@ class ExtrernalComponentGenerator(target: File) extends Utils {
     }
 
   def processElementImports(module: Module, element: Element)(implicit output: IndentWriter) = {
+    outln("import java.{util => ju}")
     outln("import scalajs.js")
     outln("import scala.scalajs.js.{UndefOr, |}")
     outln("import scala.scalajs.js.annotation.JSImport")

@@ -47,6 +47,7 @@
     {
         "name": "Paper",
         "props": [
+            "key: String = ju.UUID.randomUUID().toString()",
             "className: js.UndefOr[String] = js.undefined"
         ]
     }

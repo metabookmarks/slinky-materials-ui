@@ -66,7 +66,7 @@ trait Styles extends js.Object {
       )
     )
 
-    def profilePanel(profile: Profile) = Paper(className = classes.paper)(
+    def profilePanel(provider: String, profile: Profile) = Paper(key = provider, className = classes.paper)(
       GridContainer(spacing = 2)(
         GridItem(key = s"photo")(
           ButtonBase(className = classes.image)(
@@ -88,7 +88,7 @@ trait Styles extends js.Object {
       userPanel(props.user),
       props.user.profiles.map {
         case (provider, profile) =>
-          profilePanel(profile)
+          profilePanel(provider, profile)
       }
     )
   }
