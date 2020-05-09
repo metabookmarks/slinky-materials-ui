@@ -1,6 +1,5 @@
 package slinky.generator
 
-import java.io.PrintWriter
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -23,6 +22,7 @@ import org.apache.commons.codec.digest.DigestUtils
 import java.io.FileInputStream
 import java.nio.file.Path
 import scala.util.Using
+import java.io.PrintWriter
 object ExtrernalComponentGenerator extends App with Utils {
 
   parser.parse(args, Config()) match {
@@ -82,8 +82,8 @@ class ExtrernalComponentGenerator(target: File) extends Utils {
     }
 
   def processModule(moduleFile: File, module: Module, outputFolder: File): Unit = {
-    if (!outputFolder.mkdirs())
-      logger.debug("sys.exit(0)")
+    if (outputFolder.mkdirs())
+      logger.debug("Output [{}] module created.", outputFolder.getAbsolutePath())
 
     if (needProcessing(module, moduleFile)) {
       writeModule(module, outputFolder)
@@ -105,48 +105,92 @@ class ExtrernalComponentGenerator(target: File) extends Utils {
               writeDigest(module, elementsFile.toFile())
             }
           )
-
         }
     }
 
   }
 
-  def ouputEnum(enum_ : Enum)(implicit printer: PrintWriter): Unit =
-    enum_.values.foreach {
-      case value @ ("true" | "false") =>
-        outln(s"    case object `$value` extends ${enum_.name}")
-      case value if value.contains("-") =>
-        outln(s"    case object `$value` extends ${enum_.name}")
-      case value if value.matches(raw"^\d.*") =>
-        outln(s"    case object `$value` extends ${enum_.name}")
-      case value =>
-        outln(s"    case object $value extends ${enum_.name}")
+  def writeModule(module: Module, outputFolder: File): Unit =
+    Using.resource(IndentWriter(new PrintWriter(outputFolder.toPath.resolve("package.scala").toFile()))) {
+      implicit output =>
+        outln(s"package ${module.parent}")
+
+        processModuleImports(module)
+
+        begin(s"package object ${module.name}") { implicit output =>
+          module.enums.foreach(processEnum)
+
+          module.objects.foreach(processObjects(module))
+
+          module.functions.foreach(processFunctions(module))
+
+          module.customAttributes.foreach(processAttribute)
+
+        }
     }
 
-  def writeModule(module: Module, outputFolder: File): Unit = {
-    implicit val output = new PrintWriter(outputFolder.toPath.resolve("package.scala").toFile())
+  def processFunctions(module: Module)(functions: List[model.Function])(implicit output: IndentWriter) = {
+    outln("@js.native")
+    outln(s"""@JSImport("${module.npm}", JSImport.Default)""")
+    begin(s"object ${module.mod} extends js.Any") { implicit output =>
+      functions.foreach { function =>
+        outln(s"@js.native")
+        outln(s"object ${function.name} extends js.Object")
+      }
 
-    outln(s"package ${module.parent}")
+    }
 
-    outln("""|import scalajs.js
-             |import scala.scalajs.js.{UndefOr, |}
-             |import scala.scalajs.js.annotation.JSImport
-             |import slinky.core.annotations.react
-             |import slinky.core.ExternalComponent
-             |import slinky.readwrite.Writer""")
+    functions.foreach { function =>
+      outln(s"${function.scala(module.mod)}")
+      function.partials.foreach { partials =>
+        outln(s"// Partial application $partials")
+        outln(
+          s"def ${function.name}[A](param: js.Dynamic): js.Function0[A] = ${function.name}[A]((param: js.Object) => param)"
+        )
+        for (n <- 2 to partials) {
+          val params = expand(n)(i => s"p$i: (String, js.Dynamic)")
+          val jsParams = expand(n)(i => s"p$i._1 -> p$i._2")
+          outln(s"def ${function.name}[A]( ${params}  ): js.Function0[A] =")
+          outln(s"${function.name}[A]((param: js.Object) => js.Dynamic.literal(${jsParams}))")
+        }
+
+      }
+
+    }
+  }
+
+  def processModuleImports(module: Module)(implicit output: IndentWriter) = {
+    outln("import scalajs.js")
+    outln("import scala.scalajs.js.{UndefOr, |}")
+    outln("import scala.scalajs.js.annotation.JSImport")
+    outln("import slinky.core.annotations.react")
+    outln("import slinky.core.ExternalComponent")
+    outln("import slinky.readwrite.Writer")
     module.customAttributes.foreach(_ => outln("import slinky.core.CustomAttribute"))
+    outln()
+  }
 
-    outln(s"package object ${module.name} {")
+  def processObjects(module: Module)(objects: List[String])(implicit output: IndentWriter) = objects.foreach { obj =>
+    outln("@js.native")
+    outln(s"""@JSImport("${module.npm}", JSImport.Default)""")
+    outln(s"object $obj extends js.Object")
+  }
+  def processAttribute(attributes: List[CustomAttribute])(implicit output: IndentWriter) =
+    attributes.foreach {
+      case CustomAttribute(name, maybeSymbol, _type) =>
+        val symbol = maybeSymbol.getOrElse(name)
+        outln(s"""  val ${symbol} = CustomAttribute[${_type}]("$name")""")
+    }
 
-    module.enums.foreach { enums =>
-      enums.foreach { enum_ =>
-        enum_.typeAlias match {
-          case Some(typeAlias) =>
-            outln(s"  object ${enum_.name} {")
-            enum_.escapedValues.foreach(value => outln(s"    case object $value"))
+  def processEnum(enums: List[Enum])(implicit output: IndentWriter) =
+    enums.foreach { enum_ =>
+      enum_.typeAlias match {
+        case Some(typeAlias) =>
+          begin(s"object ${enum_.name}") { implicit output =>
+            enum_.escapedValues.foreach(value => outln(s"case object $value"))
             typeAlias.foreach { alias =>
               outln(
-                s"    type ${alias.name} = ${alias.escapedValues
+                s"type ${alias.name} = ${alias.escapedValues
                   .getOrElse(enum_.escapedValues)
                   .map {
                     case "Boolean" => "Boolean"
@@ -154,124 +198,72 @@ class ExtrernalComponentGenerator(target: File) extends Utils {
                   }
                   .mkString(" | ")}"
               )
-              out(s"    implicit val ${alias.name}Writer: Writer[${alias.name}] = ")
+              out(s"implicit val ${alias.name}Writer: Writer[${alias.name}] = ")
               outln(alias.writer.getOrElse("_.toString.asInstanceOf[js.Object]"))
             }
-            outln("  }")
-          case None =>
-            outln(s"  sealed trait ${enum_.name}")
-            outln(s"  object ${enum_.name} {")
-            enum_.escapedValues.foreach(value => outln(s"    case object $value extends ${enum_.name}"))
-            outln(s"    implicit val a${enum_.name}Writer: Writer[${enum_.name}] = _.toString.asInstanceOf[js.Object]")
-            outln("  }")
-        }
-
-      }
-    }
-
-    module.objects.foreach(objects =>
-      objects.foreach { obj =>
-        outln("  @js.native")
-        outln(s"""  @JSImport("${module.npm}", JSImport.Default)""")
-        outln(s"  object $obj extends js.Object")
-      }
-    )
-
-    module.functions.foreach { functions =>
-      outln("  @js.native")
-      outln(s"""  @JSImport("${module.npm}", JSImport.Default)""")
-      outln(s"  object ${module.mod} extends js.Any {")
-
-      functions.foreach { function =>
-        outln(s"    @js.native")
-        outln(s"    object ${function.name} extends js.Object")
-      }
-
-      outln("  }")
-
-      functions.foreach { function =>
-        outln(s"  ${function.scala(module.mod)}")
-        function.partials.foreach { partials =>
-          outln(s"  //Partial application $partials")
-          //    def mk[A](css: js.Dynamic) =  makeStyles[A]((theme: js.Object) => css)
-
-          outln(
-            s"  def ${function.name}[A](param: js.Dynamic): js.Function0[A] = ${function.name}[A]((param: js.Object) => param)"
-          )
-          for (n <- 2 to partials) {
-            //def mk[A](t1: (String, js.Dynamic)) = makeStyles[A]((theme: js.Object) => js.Dynamic.literal(t1._1 -> t1._2))
-            val params = expand(n)(i => s"p$i: (String, js.Dynamic)")
-            val jsParams = expand(n)(i => s"p$i._1 -> p$i._2")
+          }
+        case None =>
+          outln(s"sealed trait ${enum_.name}")
+          begin(s"object ${enum_.name}") { implicit output =>
+            enum_.escapedValues.foreach(value => outln(s"case object $value extends ${enum_.name}"))
             outln(
-              s"  def ${function.name}[A]( ${params}  ): js.Function0[A] =\n" +
-              s"    ${function.name}[A]((param: js.Object) => js.Dynamic.literal(${jsParams}))"
+              s"implicit val a${enum_.name}Writer: Writer[${enum_.name}] = _.toString.asInstanceOf[js.Object]"
             )
           }
-
-        }
-
       }
 
     }
-
-    module.customAttributes.foreach { attributes =>
-      attributes.foreach {
-        case CustomAttribute(name, maybeSymbol, _type) =>
-          val symbol = maybeSymbol.getOrElse(name)
-          outln(s"""  val ${symbol} = CustomAttribute[${_type}]("$name")""")
-      }
-    }
-
-    outln("}")
-
-    output.close()
-  }
 
   def expand(n: Int)(f: Int => String) = (1 to n).map(i => f(i)).mkString(", ")
 
-  def processElement(module: Module, element: Element, outputFolder: File): Unit = {
+  def processElement(module: Module, element: Element, outputFolder: File): Unit =
+    Using.resource(IndentWriter(new PrintWriter(outputFolder.toPath.resolve(s"${element.name}.scala").toFile()))) {
+      implicit output =>
+        outln("//GENERATED DO NO EDIT")
 
-    implicit val output = new PrintWriter(outputFolder.toPath.resolve(s"${element.name}.scala").toFile())
+        outln(s"package ${module.pkg}")
 
-    outln("//GENERATED DO NO EDIT")
+        processElementImports(module, element)
 
-    outln(s"package ${module.pkg}")
-    outln("""|import scalajs.js
-|import scala.scalajs.js.{UndefOr, |}
-|import scala.scalajs.js.annotation.JSImport
-|import slinky.core.annotations.react
-|import slinky.core.ExternalComponent""")
+        outln(s"""@JSImport("${module.npm}", JSImport.Default)""")
+        outln("@js.native")
+
+        begin(s"""private object ${element.dom} extends js.Object""") { implicit output =>
+          outln(s"val ${element.name}: js.Object = js.native")
+        }
+
+        if (element.props.isEmpty) {
+          begin(s"object ${element.name} extends ${element.baseClass}") { implicit output =>
+            outln(s"override val component = ${element.dom}.${element.name}")
+          }
+        } else {
+          begin(s"@react object ${element.name} extends ${element.baseClass}") { implicit output =>
+            element.props.foreach { props =>
+              out("case class Props(")
+              props.dropRight(1).foreach(prop => outln(s"  $prop,"))
+              outln(s"  ${props.last}")
+              outln(")")
+            }
+            outln(s"override val component = ${element.dom}.${element.name}")
+          }
+
+        }
+    }
+
+  def processElementImports(module: Module, element: Element)(implicit output: IndentWriter) = {
+    outln("import scalajs.js")
+    outln("import scala.scalajs.js.{UndefOr, |}")
+    outln("import scala.scalajs.js.annotation.JSImport")
+    outln("import slinky.core.annotations.react")
+    outln("import slinky.core.ExternalComponent")
     module.customAttributes.foreach(_ => outln("import slinky.core.CustomAttribute"))
-    outln("""import org.scalajs.dom.raw._
-import slinky.web.SyntheticMouseEvent
-""")
+    outln("import org.scalajs.dom.raw._")
+    outln("import slinky.web.SyntheticMouseEvent")
+
     module.imports.foreach(imports => imports.foreach(imp => outln(s"import $imp")))
     element.imports.foreach(imports => imports.foreach(imp => outln(s"import $imp")))
 
     outln()
-    outln(s"""@JSImport("${module.npm}", JSImport.Default)""")
-    outln("@js.native")
-
-    outln(s"""private object ${element.dom} extends js.Object {
-             |  val ${element.name}: js.Object = js.native
-             |}""")
-
-    if (element.props.isEmpty) {
-      out(s"object ${element.name} extends ${element.baseClass}")
-      outln(" {")
-    } else {
-      out(s"@react object ${element.name} extends ${element.baseClass}")
-      outln(" {")
-      element.props.foreach { props =>
-        out("  case class Props(")
-        out(props.mkString(",\n    "))
-        outln(")")
-      }
-    }
-    outln(s"  override val component = ${element.dom}.${element.name}")
-    outln("}")
-
-    output.close()
   }
 
 }

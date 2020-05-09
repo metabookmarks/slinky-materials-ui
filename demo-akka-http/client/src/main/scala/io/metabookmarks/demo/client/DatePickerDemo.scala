@@ -22,9 +22,6 @@ import slinky.materialui.core._
       Grid(container = true, alignContent = Align.`space-between`)(
         Grid(xs = Size.`12`)(
           KeyboardDatePicker(value = date, format = "MM/dd/yyyy", label = "day", onChange = setDate)
-        ),
-        Grid(xs = Size.`12`)(
-          Link(href := "/")("coucou")
         )
       )
     )

@@ -3,6 +3,7 @@ package slinky.generator
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.PrintWriter
+import scala.util.Using
 
 case class Config(target: File = new File("target/"),
                   output: File = new File("target/"),
@@ -34,7 +35,10 @@ trait Utils {
       )
   }
 
-  def out(str: String)(implicit printer: PrintWriter) = printer.print(str.stripMargin)
-  def outln(str: String = "")(implicit printer: PrintWriter) = printer.println(str.stripMargin)
+  def begin(str: String)(f: IndentWriter => Unit)(implicit printer: IndentWriter) =
+    Using.resource(printer.begin(str))(indentWriter => f(indentWriter))
+  def out(str: String)(implicit printer: IndentWriter) = printer.out(str)
+  def outln(str: String = "")(implicit printer: IndentWriter) = printer.outln(str)
+  def end()(implicit printer: IndentWriter) = printer.end()
 
 }
