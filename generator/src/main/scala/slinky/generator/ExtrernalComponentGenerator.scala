@@ -232,22 +232,27 @@ class ExtrernalComponentGenerator(target: File) extends Utils {
           outln(s"val ${element.name}: js.Object = js.native")
         }
 
-        if (element.props.isEmpty) {
+        def processNoPropsElement(element: Element): Unit =
           begin(s"object ${element.name} extends ${element.baseClass}") { implicit output =>
             outln(s"override val component = ${element.dom}.${element.name}")
           }
-        } else {
-          begin(s"@react object ${element.name} extends ${element.baseClass}") { implicit output =>
-            element.props.foreach { props =>
-              out("case class Props(")
-              props.dropRight(1).foreach(prop => outln(s"  $prop,"))
-              outln(s"  ${props.last}")
-              outln(")")
+
+        element.components.foreach { component =>
+          if (component.props.isEmpty)
+            processNoPropsElement(component)
+          else
+            begin(s"@react object ${component.name} extends ${component.baseClass}") { implicit output =>
+              component.props.foreach { props =>
+                out("case class Props(")
+                props.dropRight(1).foreach(prop => outln(s"  $prop,"))
+                outln(s"  ${props.last}")
+                outln(")")
+              }
+              outln(s"override val component = ${element.dom}.${element.name}")
             }
-            outln(s"override val component = ${element.dom}.${element.name}")
-          }
 
         }
+
     }
 
   def processElementImports(module: Module, element: Element)(implicit output: IndentWriter) = {

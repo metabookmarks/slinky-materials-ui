@@ -13,9 +13,9 @@ import scala.scalajs.js.annotation.JSImport
   type Props = Unit
 
   def render(): ReactElement =
-    Grid(container = true, wrap = Wrap.wrap, spacing = 2)(
+    GridContainer(wrap = Wrap.wrap, spacing = 2)(
       (1 to 12).map(i =>
-        Grid(key = s"k$i", item = true, sm = Size.`2`)(
+        GridItem(key = s"k$i", sm = Size.`2`)(
           Card(
             CardContent(
               Typography("iiz zizi zi ziz i ziziz izi ")

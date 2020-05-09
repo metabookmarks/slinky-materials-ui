@@ -34,15 +34,15 @@ import org.scalajs.dom.raw.Event
         DialogTitle(id = "mydiag")(span(s"Hello $folder")),
         DialogContent(
           FormControl(
-            Grid(container = true, spacing = 3)(
+            GridContainer(spacing = 3)(
               // Grid(sm = Size.`12`, item = true)(
               //   div(s"${clicked1} && ${clicked2}"),
               //   div(description)
               // ),
-              Grid(sm = Size.`2`, item = true)(
+              GridItem(sm = Size.`2`)(
                 Button(onClick = e => post(e))(span("Create"))
               ),
-              Grid(sm = Size.`2`, item = true)(
+              GridItem(sm = Size.`2`)(
                 FormGroup(
                   FormControlLabel(label = "Public",
                                    control = Switch(name = "public",
@@ -50,10 +50,10 @@ import org.scalajs.dom.raw.Event
                                                     onChange = e => setClicked1(e.target.checked)))
                 )
               ),
-              Grid(sm = Size.`8`, item = true)(
+              GridItem(sm = Size.`8`)(
                 TextField(id = "folder", fullWidth = true, onChange = e => setFolder(e.target.value))
               ),
-              Grid(sm = Size.`12`, item = true)(
+              GridItem(sm = Size.`12`)(
                 TextField(id = "description",
                           fullWidth = true,
                           multiline = true,

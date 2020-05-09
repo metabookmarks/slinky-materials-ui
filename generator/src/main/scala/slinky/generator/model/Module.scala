@@ -23,9 +23,27 @@ case class Function(name: String, args: List[String], partials: Option[Int]) {
 
 }
 case class CustomAttribute(name: String, symbol: Option[String], `type`: String)
-case class Element(name: String, wrap: Option[String], imports: Option[List[String]], props: Option[List[String]]) {
+
+case class Element(name: String,
+                   splitted: Option[List[Element]],
+                   wrap: Option[String],
+                   imports: Option[List[String]],
+                   props: Option[List[String]]) {
 
   private def ucFirst(str: String) = str.take(1).toUpperCase().appendedAll(str.drop(1))
+
+  def merge(orig: Element, split: Element): Element =
+    split.copy(
+      name = split.name,
+      imports = Option(List(orig.imports.getOrElse(Seq.empty), split.imports.getOrElse(Seq.empty)).flatten),
+      wrap = split.wrap.orElse(orig.wrap),
+      props = Option(List(orig.props.getOrElse(Seq.empty), split.props.getOrElse(Seq.empty)).flatten)
+    )
+
+  def components = splitted match {
+    case None => Seq(this)
+    case Some(splits) => splits.map(split => merge(this, split))
+  }
 
   def dom = s"${name}DOM"
 

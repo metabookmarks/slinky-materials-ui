@@ -185,24 +185,38 @@
     {
       "name": "Grid",
       "imports": ["Size.orBooleanWriter"],
+      "splitted": [
+        {
+          "name": "GridContainer",
+          "props":[
+             "container: Boolean = true",
+             "item: Boolean = false",
+             "zeroMinWidth: UndefOr[Boolean] = js.undefined",
+             "justify: UndefOr[Align.Justify] = js.undefined",
+             "alignContent: UndefOr[Align.Content] = js.undefined",
+             "alignItems: UndefOr[Align.Items] = js.undefined",
+             "direction: UndefOr[String] = js.undefined",
+             "wrap: UndefOr[Wrap] = js.undefined",
+             "spacing: UndefOr[Int] = js.undefined"                    
+          ]
+        },
+        {
+          "name":"GridItem",
+          "props":[
+            "item: Boolean = true",
+            "container: Boolean = false",
+            "lg: UndefOr[Size.orBoolean] = js.undefined",
+            "md: UndefOr[Size.orBoolean] = js.undefined",
+            "sm: UndefOr[Size.orBoolean] = js.undefined",
+            "xl: UndefOr[Size.orBoolean] = js.undefined",
+            "xs: UndefOr[Size.orBoolean] = js.undefined"
+          ]
+        }
+      ],
       "props": [
         "key: String = \"\"",
-        "container: Boolean = false",
         "classes: js.UndefOr[js.Object] = js.undefined",
-        "item: Boolean = false",
-        "zeroMinWidth: UndefOr[Boolean] = js.undefined",
-        "justify: UndefOr[Align.Justify] = js.undefined",
-        "alignContent: UndefOr[Align.Content] = js.undefined",
-        "alignItems: UndefOr[Align.Items] = js.undefined",
-        "direction: UndefOr[String] = js.undefined",
-        "component: String = \"div\"",
-        "lg: UndefOr[Size.orBoolean] = js.undefined",
-        "md: UndefOr[Size.orBoolean] = js.undefined",
-        "sm: UndefOr[Size.orBoolean] = js.undefined",
-        "xl: UndefOr[Size.orBoolean] = js.undefined",
-        "xs: UndefOr[Size.orBoolean] = js.undefined",
-        "wrap: UndefOr[Wrap] = js.undefined",
-        "spacing: UndefOr[Int] = js.undefined"
+        "component: String = \"div\""
       ]
     },
     {

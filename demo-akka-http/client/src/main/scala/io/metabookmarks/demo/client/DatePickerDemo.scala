@@ -19,8 +19,8 @@ import slinky.materialui.core._
     val (date, setDate) = useState(props.date)
 
     MuiPickersUtilsProvider(utils = DateFnsUtils)(
-      Grid(container = true, alignContent = Align.`space-between`)(
-        Grid(xs = Size.`12`)(
+      GridContainer(alignContent = Align.`space-between`)(
+        GridItem(xs = Size.`12`)(
           KeyboardDatePicker(value = date, format = "MM/dd/yyyy", label = "day", onChange = setDate)
         )
       )
