@@ -1,3 +1,7 @@
 [{
-    "name": "Typography"
+    "name": "Typography",
+    "props": [
+        "gutterBottom: UndefOr[Boolean] = js.undefined",
+        "variant: UndefOr[String] = js.undefined"
+    ]
 }]

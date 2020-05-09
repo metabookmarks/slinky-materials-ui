@@ -88,7 +88,7 @@
     {
       "name": "makeStyles",
       "args": ["rule"],
-      "partials": 3
+      "partials": 5
     }
   ],
   "elements": [
@@ -132,6 +132,12 @@
       ],
       "docLines": [
         "<span class=\"seoSummary\">The <strong>HTML <code>&lt;a&gt;</code> element</strong> (or <em>anchor</em> element) creates a hyperlink to other web pages, files, locations within the same page, email addresses, or any other URL.</span>"
+      ]
+    },
+    {
+      "name": "ButtonBase",
+      "props":[
+        "className: js.UndefOr[String] = js.undefined"
       ]
     },
     {
@@ -186,6 +192,25 @@
       "name": "Grid",
       "imports": ["Size.orBooleanWriter"],
       "splitted": [
+        {
+         "name":"Grid",
+          "props": [
+            "container: Boolean = true",
+            "item: Boolean = true",
+            "zeroMinWidth: UndefOr[Boolean] = js.undefined",
+            "justify: UndefOr[Align.Justify] = js.undefined",
+            "alignContent: UndefOr[Align.Content] = js.undefined",
+            "alignItems: UndefOr[Align.Items] = js.undefined",
+            "direction: UndefOr[String] = js.undefined",
+            "wrap: UndefOr[Wrap] = js.undefined",
+            "spacing: UndefOr[Int] = js.undefined",
+            "lg: UndefOr[Size.orBoolean] = js.undefined",
+            "md: UndefOr[Size.orBoolean] = js.undefined",
+            "sm: UndefOr[Size.orBoolean] = js.undefined",
+            "xl: UndefOr[Size.orBoolean] = js.undefined",
+            "xs: UndefOr[Size.orBoolean] = js.undefined"
+          ]
+        },
         {
           "name": "GridContainer",
           "props":[

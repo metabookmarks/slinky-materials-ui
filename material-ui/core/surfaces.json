@@ -45,6 +45,9 @@
         "name": "Collapse"
     },
     {
-        "name": "Paper"
+        "name": "Paper",
+        "props": [
+            "className: js.UndefOr[String] = js.undefined"
+        ]
     }
 ]
