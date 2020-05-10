@@ -4,10 +4,17 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.PrintWriter
 import scala.util.Using
+import java.nio.file.Files
 
 case class Config(target: File = new File("target/"),
-                  output: File = new File("target/"),
-                  modules: List[File] = List.empty)
+                  srcManaged: File = new File("target/"),
+                  modulesPath: File = new File("src/main/npm")) {
+  def modules: List[File] = {
+    val finder = new ModuleFinder()
+    Files.walkFileTree(modulesPath.toPath(), finder)
+    finder.modules
+  }
+}
 
 trait Utils {
   val logger = LoggerFactory.getLogger(getClass())
@@ -20,19 +27,19 @@ trait Utils {
           .copy(target = target)
       )
       .required()
-    opt[File]("output")
-      .action((output, config) =>
+    opt[File]("src-managed")
+      .action((srcManaged, config) =>
         config
-          .copy(output = output)
+          .copy(srcManaged = srcManaged)
+      )
+      .required()
+    opt[File]("modulesPath")
+      .action((modulesPath, config) =>
+        config
+          .copy(modulesPath = modulesPath)
       )
       .required()
     help("help")
-    arg[File]("modules")
-      .unbounded()
-      .action((module, config) =>
-        config
-          .copy(modules = config.modules :+ module)
-      )
   }
 
   def begin(str: String)(f: IndentWriter => Unit)(implicit printer: IndentWriter) =

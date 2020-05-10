@@ -102,31 +102,6 @@ lazy val `material-components-web` = project.in(file("material-components-web"))
     normalizedName := "material-components-web"
   )
   .settings(
-    Compile / sourceGenerators += Def
-        .taskDyn[Seq[File]] {
-          val baseDir = baseDirectory.value
-          val rootFolder = (Compile / sourceManaged).value / "slinky/material-components-web"
-          rootFolder.mkdirs()
-
-          val core = (generator / Compile / runMain)
-            .toTask {
-              (Seq("slinky.generator.mdc.MDCGenerator",
-                  "--target",
-                  target.value,
-                  "--output",
-                  (rootFolder.getAbsolutePath)
-                  ) ++ (baseDir  *  "*.json").get.toList
-
-                              )                .mkString(" ", " ", "")
-            }
-            .map(_ => (rootFolder ** "*.scala").get)
-          core
-          }.taskValue,
-    Compile / packageSrc / mappings ++= {
-      val base = (Compile / sourceManaged).value
-      val files = (Compile / managedSources).value
-      files.map(f => (f, f.relativeTo(base).get.getPath))
-    },
     librarySettings,
     crossScalaSettings
   )
@@ -158,14 +133,15 @@ lazy val `material-ui` = project
           rootFolder.mkdirs()
           (generator / Compile / runMain)
             .toTask {
-              (Seq("slinky.generator.ExtrernalComponentGenerator",
-                  "--target",
-                  target.value,
-                  "--output",
-                  (rootFolder.getAbsolutePath)
-                  ) ++ (baseDir  *  "*.json").get.toList
-
-                              )                .mkString(" ", " ", "")
+              Seq("slinky.generator.ExtrernalComponentGenerator",
+                   "--target",
+                   target.value,
+                   "--src-managed",
+                   rootFolder,
+                  "--modulesPath",
+                  s"${baseDir.getAbsolutePath}/src/main/npm"
+//              ++ (baseDir / "src/main/npm/material" * "*.json").get.toList)
+              ).mkString(" ", " ", "")
             }
             .map(_ => (rootFolder ** "*.scala").get)
         }

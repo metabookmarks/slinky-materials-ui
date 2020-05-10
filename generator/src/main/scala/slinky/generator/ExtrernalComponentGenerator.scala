@@ -29,7 +29,6 @@ object ExtrernalComponentGenerator extends App with Utils {
     case None =>
       logger.error(parser.usage)
     case Some(config) =>
-      logger.info(s"output: ${config.output}")
       config.modules.foreach { moduleFile =>
         logger.debug(s"\t* ${moduleFile.getName()}")
 
@@ -45,7 +44,7 @@ object ExtrernalComponentGenerator extends App with Utils {
             }
           case Right(module) =>
             val generator = new ExtrernalComponentGenerator(config.target)
-            generator.processModule(moduleFile, module, new File(config.output, module.name))
+            generator.processModule(moduleFile, module, new File(config.srcManaged, module.name))
         }
       }
   }

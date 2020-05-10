@@ -1,6 +1,3 @@
 import sbt._
 
-object ProjectDef {
-
-
-}
+object ProjectDef {}

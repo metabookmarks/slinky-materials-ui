@@ -25,7 +25,6 @@ object MDCGenerator extends App with Utils {
     case None =>
       logger.error(parser.usage)
     case Some(config) =>
-      logger.info(s"output: ${config.output}")
       config.modules.foreach { module =>
         logger.info(s"\t* $module")
 
