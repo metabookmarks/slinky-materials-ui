@@ -8,7 +8,8 @@ import java.nio.file.Files
 
 case class Config(target: File = new File("target/"),
                   srcManaged: File = new File("target/"),
-                  modulesPath: File = new File("src/main/npm")) {
+                  modulesPath: File = new File("src/main/npm")
+) {
   def modules: List[File] = {
     val finder = new ModuleFinder()
     Files.walkFileTree(modulesPath.toPath(), finder)

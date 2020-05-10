@@ -58,9 +58,11 @@ class ExtrernalComponentGenerator(target: File) extends Utils {
     if (digestFile(module, file).exists) {
       val old = Source.fromFile(digestFile(module, file)).getLines().mkString
 
-      if (DigestUtils
-            .sha256Hex(new FileInputStream(file))
-            .contentEquals(old)) {
+      if (
+        DigestUtils
+          .sha256Hex(new FileInputStream(file))
+          .contentEquals(old)
+      ) {
         logger.debug(s"${file.getName()} unchanged")
         false
       } else {
@@ -91,7 +93,7 @@ class ExtrernalComponentGenerator(target: File) extends Utils {
     }
 
     val moduleFolder = moduleFile.toPath().resolveSibling(module.name)
-    if (Files.exists(moduleFolder)) {
+    if (Files.exists(moduleFolder))
       Files
         .list(moduleFolder)
         .toScala(LazyList)
@@ -105,7 +107,6 @@ class ExtrernalComponentGenerator(target: File) extends Utils {
             }
           )
         }
-    }
 
   }
 
@@ -169,11 +170,12 @@ class ExtrernalComponentGenerator(target: File) extends Utils {
     outln()
   }
 
-  def processObjects(module: Module)(objects: List[String])(implicit output: IndentWriter) = objects.foreach { obj =>
-    outln("@js.native")
-    outln(s"""@JSImport("${module.npm}", JSImport.Default)""")
-    outln(s"object $obj extends js.Object")
-  }
+  def processObjects(module: Module)(objects: List[String])(implicit output: IndentWriter) =
+    objects.foreach { obj =>
+      outln("@js.native")
+      outln(s"""@JSImport("${module.npm}", JSImport.Default)""")
+      outln(s"object $obj extends js.Object")
+    }
   def processAttribute(attributes: List[CustomAttribute])(implicit output: IndentWriter) =
     attributes.foreach {
       case CustomAttribute(name, maybeSymbol, _type) =>

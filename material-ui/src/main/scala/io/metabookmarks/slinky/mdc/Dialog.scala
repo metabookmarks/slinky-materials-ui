@@ -57,13 +57,15 @@ import scala.scalajs.js.JSON
           footer(className := "mdc-dialog__actions")(
             button(className := "mdc-button mdc-dialog__button",
                    data - "mdc-dialog-action" := "no",
-                   onClick := (_ => onDismiss()))(
+                   onClick := (_ => onDismiss())
+            )(
               div(className := "mdc-button__ripple"),
               span(className := "mdc-button__label")("No")
             ),
             button(className := "mdc-button mdc-dialog__button",
                    data - "mdc-dialog-action" := "yes",
-                   onClick := (_ => onAccept()))(
+                   onClick := (_ => onAccept())
+            )(
               div(className := "mdc-button__ripple"),
               span(className := "mdc-button__label")("Yes")
             )

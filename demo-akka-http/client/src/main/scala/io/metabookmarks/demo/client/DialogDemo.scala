@@ -47,7 +47,9 @@ import org.scalajs.dom.raw.Event
                   FormControlLabel(label = "Public",
                                    control = Switch(name = "public",
                                                     checked = clicked1,
-                                                    onChange = e => setClicked1(e.target.checked)))
+                                                    onChange = e => setClicked1(e.target.checked)
+                                   )
+                  )
                 )
               ),
               GridItem(sm = Size.`8`)(
@@ -57,7 +59,8 @@ import org.scalajs.dom.raw.Event
                 TextField(id = "description",
                           fullWidth = true,
                           multiline = true,
-                          onChange = e => setDescription(e.target.value))
+                          onChange = e => setDescription(e.target.value)
+                )
               )
             )
           )
@@ -66,9 +69,10 @@ import org.scalajs.dom.raw.Event
     }
   }
 
-  def render = div(
-    if (state.open) Some(SimpleDialog(name = "zozo")) else None,
-    div(Button(onClick = e => setState(st => st.copy(open = true)))(span("Helo")))
-  )
+  def render =
+    div(
+      if (state.open) Some(SimpleDialog(name = "zozo")) else None,
+      div(Button(onClick = e => setState(st => st.copy(open = true)))(span("Helo")))
+    )
   def initialState: State = State(false)
 }

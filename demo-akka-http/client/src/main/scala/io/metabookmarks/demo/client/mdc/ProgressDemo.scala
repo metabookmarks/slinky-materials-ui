@@ -23,7 +23,8 @@ import slinky.core.CustomAttribute
       div(className := "mdc-circular-progress__determinate-container")(
         svg.svg(svg.className := "mdc-circular-progress__determinate-circle-graphic",
                 svg.viewBox := "0 0 48 48",
-                xmlns := "http://www.w3.org/2000/svg")(
+                xmlns := "http://www.w3.org/2000/svg"
+        )(
           svg.circle(
             svg.className := "mdc-circular-progress__determinate-circle",
             svg.cx := 24,
@@ -38,32 +39,38 @@ import slinky.core.CustomAttribute
             div(className := "mdc-circular-progress__circle-clipper mdc-circular-progress__circle-left")(
               svg.svg(svg.className := "mdc-circular-progress__indeterminate-circle-graphic",
                       svg.viewBox := "0 0 48 48",
-                      xmlns := "http://www.w3.org/2000/svg")(
+                      xmlns := "http://www.w3.org/2000/svg"
+              )(
                 svg.circle(svg.cx := 24,
                            svg.cy := 24,
                            svg.r := 18,
                            svg.strokeDasharray := "113.097",
-                           svg.strokeDashoffset := "56.549")
+                           svg.strokeDashoffset := "56.549"
+                )
               ),
               div(className := "mdc-circular-progress__gap-patch")(
                 svg.svg(svg.className := "mdc-circular-progress__indeterminate-circle-graphic",
                         svg.viewBox := "0 0 48 48",
-                        xmlns := "http://www.w3.org/2000/svg")(
+                        xmlns := "http://www.w3.org/2000/svg"
+                )(
                   svg.circle(svg.cx := 24,
                              svg.cy := 24,
                              svg.r := 18,
                              svg.strokeDasharray := "113.097",
-                             svg.strokeDashoffset := "56.549")
+                             svg.strokeDashoffset := "56.549"
+                  )
                 ),
                 div(className := "mdc-circular-progress__circle-clipper mdc-circular-progress__circle-right")(
                   svg.svg(svg.className := "mdc-circular-progress__indeterminate-circle-graphic",
                           svg.viewBox := "0 0 48 48",
-                          xmlns := "http://www.w3.org/2000/svg")(
+                          xmlns := "http://www.w3.org/2000/svg"
+                  )(
                     svg.circle(svg.cx := 24,
                                svg.cy := 24,
                                svg.r := 18,
                                svg.strokeDasharray := "113.097",
-                               svg.strokeDashoffset := "56.549")
+                               svg.strokeDashoffset := "56.549"
+                    )
                   )
                 )
               )

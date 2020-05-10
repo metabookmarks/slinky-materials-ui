@@ -23,20 +23,23 @@ import org.scalajs.dom.raw.Element
 
   private def openClassName = if (state.open) " mdc-drawer--open" else ""
 
-  private def menuItem(item: MenuItem) = item match {
-    case MenuURLItem(label, icon, url) =>
-      a(className := "mdc-list-item", href := url)(
-        i(className := "material-icons mdc-list-item__start-detail", aria - "hidden" := "true")(icon),
-        label
-      )
-    case MenuContentItem(label, icon, element) =>
-      a(className := "mdc-list-item", onClick := (_ => {
-          setState(_.copy(section = label, content = element()))
-        }))(
-        i(className := "material-icons mdc-list-item__start-detail", aria - "hidden" := "true")(icon),
-        label
-      )
-  }
+  private def menuItem(item: MenuItem) =
+    item match {
+      case MenuURLItem(label, icon, url) =>
+        a(className := "mdc-list-item", href := url)(
+          i(className := "material-icons mdc-list-item__start-detail", aria - "hidden" := "true")(icon),
+          label
+        )
+      case MenuContentItem(label, icon, element) =>
+        a(className := "mdc-list-item",
+          onClick := (_ => {
+              setState(_.copy(section = label, content = element()))
+            })
+        )(
+          i(className := "material-icons mdc-list-item__start-detail", aria - "hidden" := "true")(icon),
+          label
+        )
+    }
 
   def render(): ReactElement =
     div(className := "drawer-frame-root")(

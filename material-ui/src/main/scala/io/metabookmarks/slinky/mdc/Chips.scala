@@ -28,7 +28,7 @@ trait EventManager {
       span(role := "gridcell")(
         span(role := "button", tabIndex := 0, className := "mdc-chip__primary-action")(
           span(
-            onClick := ((e) => props.eventManager.onClick(props.key)),
+            onClick := (e => props.eventManager.onClick(props.key)),
             draggable := "true",
             onDragStart := { e =>
               props.eventManager.onStart(e.nativeEvent.asInstanceOf[DragEvent].dataTransfer, props.key)
@@ -51,10 +51,11 @@ trait EventManager {
 
   def initialState: State = State(props.labels.map(label => Chip(label, props.eventManager)))
 
-  def render(): ReactElement = span(className := "mdc-chip-set", role := "grid")(
-    span(
-      state.paths: _*
-    ),
-    span(role := "grid", className := "material-icons")("add")
-  )
+  def render(): ReactElement =
+    span(className := "mdc-chip-set", role := "grid")(
+      span(
+        state.paths: _*
+      ),
+      span(role := "grid", className := "material-icons")("add")
+    )
 }

@@ -47,42 +47,44 @@ trait Styles extends js.Object {
   val component = FunctionalComponent[Props] { props =>
     val classes: Styles = useStyles()
 
-    def userPanel(user: User) = Paper(className = classes.paper)(
-      GridContainer(spacing = 2)(
-        GridItem(key = s"photo")(
-          ButtonBase(className = classes.image)(
-            img(className := classes.img, src := user.avatarURL)
-          )
-        ),
-        Grid(key = s"gen", sm = true, xs = Size.`12`)(
-          Grid(xs = true, direction = "column", spacing = 2)(
-            GridItem(xs = true)(
-              Typography(gutterBottom = true, variant = "subtitle1")(user.email),
-              Typography(user.firstName),
-              Typography(user.lastName)
+    def userPanel(user: User) =
+      Paper(className = classes.paper)(
+        GridContainer(spacing = 2)(
+          GridItem(key = s"photo")(
+            ButtonBase(className = classes.image)(
+              img(className := classes.img, src := user.avatarURL)
+            )
+          ),
+          Grid(key = s"gen", sm = true, xs = Size.`12`)(
+            Grid(xs = true, direction = "column", spacing = 2)(
+              GridItem(xs = true)(
+                Typography(gutterBottom = true, variant = "subtitle1")(user.email),
+                Typography(user.firstName),
+                Typography(user.lastName)
+              )
             )
           )
         )
       )
-    )
 
-    def profilePanel(provider: String, profile: Profile) = Paper(key = provider, className = classes.paper)(
-      GridContainer(spacing = 2)(
-        GridItem(key = s"photo")(
-          ButtonBase(className = classes.image)(
-            img(className := classes.img, src := profile.avatarURL)
-          )
-        ),
-        Grid(key = s"gen", sm = true, xs = Size.`12`)(
-          Grid(xs = true, direction = "column", spacing = 2)(
-            GridItem(xs = true)(
-              Typography(gutterBottom = true, variant = "subtitle1")(profile.providerKey),
-              Typography(profile.fullName)
+    def profilePanel(provider: String, profile: Profile) =
+      Paper(key = provider, className = classes.paper)(
+        GridContainer(spacing = 2)(
+          GridItem(key = s"photo")(
+            ButtonBase(className = classes.image)(
+              img(className := classes.img, src := profile.avatarURL)
+            )
+          ),
+          Grid(key = s"gen", sm = true, xs = Size.`12`)(
+            Grid(xs = true, direction = "column", spacing = 2)(
+              GridItem(xs = true)(
+                Typography(gutterBottom = true, variant = "subtitle1")(profile.providerKey),
+                Typography(profile.fullName)
+              )
             )
           )
         )
       )
-    )
 
     div(className := classes.root)(
       userPanel(props.user),

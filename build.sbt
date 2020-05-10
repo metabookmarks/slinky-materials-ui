@@ -39,11 +39,11 @@ lazy val slinkyMaterial = project
 lazy val librarySettings = Seq(
   scalacOptions ++= {
     val origVersion = version.value
-    val githubVersion = if (origVersion.contains("-")) {
-      origVersion.split('-').last
-    } else {
-      s"v$origVersion"
-    }
+    val githubVersion =
+      if (origVersion.contains("-"))
+        origVersion.split('-').last
+      else
+        s"v$origVersion"
     Seq(
       slinkySourceMap, {
         val a = baseDirectory.value.toURI
@@ -83,16 +83,16 @@ lazy val crossScalaSettings = Seq(
 
 lazy val generator = project
   .settings(
-    libraryDependencies ++= Seq("com.github.scopt" %% "scopt" % "3.7.1",
-    "ch.qos.logback"        % "logback-classic" % "1.2.3"
-  ))
+    libraryDependencies ++= Seq("com.github.scopt" %% "scopt" % "3.7.1", "ch.qos.logback" % "logback-classic" % "1.2.3")
+  )
   .settings(
     publish := {},
     publishLocal := {}
   )
 
-lazy val `material-components-web` = project.in(file("material-components-web"))
-.enablePlugins(ScalaJSBundlerPlugin)
+lazy val `material-components-web` = project
+  .in(file("material-components-web"))
+  .enablePlugins(ScalaJSBundlerPlugin)
   .settings(
     libraryDependencies ++= Seq(
         "org.scala-js" %%% "scalajs-dom" % "1.0.0",
@@ -111,7 +111,7 @@ lazy val `material-components-web` = project.in(file("material-components-web"))
       ),
     Compile / npmDependencies += "material-components-web" -> "6.0.0",
     Compile / npmDependencies += "react" -> "16.13.1",
-    Compile / npmDependencies += "react-dom" -> "16.13.1",
+    Compile / npmDependencies += "react-dom" -> "16.13.1"
   )
 
 lazy val `material-ui` = project
@@ -133,13 +133,14 @@ lazy val `material-ui` = project
           rootFolder.mkdirs()
           (generator / Compile / runMain)
             .toTask {
-              Seq("slinky.generator.ExtrernalComponentGenerator",
-                   "--target",
-                   target.value,
-                   "--src-managed",
-                   rootFolder,
-                  "--modulesPath",
-                  s"${baseDir.getAbsolutePath}/src/main/npm"
+              Seq(
+                "slinky.generator.ExtrernalComponentGenerator",
+                "--target",
+                target.value,
+                "--src-managed",
+                rootFolder,
+                "--modulesPath",
+                s"${baseDir.getAbsolutePath}/src/main/npm"
 //              ++ (baseDir / "src/main/npm/material" * "*.json").get.toList)
               ).mkString(" ", " ", "")
             }
@@ -213,12 +214,12 @@ lazy val client = project
     publishLocal := {}
   )
 
-  lazy val `mdc-demo` = demoProject(project in file(s"demo-akka-http/mdc-demo"))
+lazy val `mdc-demo` = demoProject(project in file(s"demo-akka-http/mdc-demo"))
   .dependsOn(sharedJs, `material-components-web`)
   .settings(
     scalacOptions += slinkySourceMap
   )
-  
+
 lazy val shared = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("demo-akka-http/shared"))
@@ -240,14 +241,14 @@ fork in Global := true
 // loads the server project at sbt startup
 //onLoad in Global := (onLoad in Global).value.andThen(state => "project server" :: state)
 
-def demoProject(p: Project): Project =  p
-      .enablePlugins(ScalaJSBundlerPlugin)
-      .settings(commonSettings)
-      .settings(scalacOptions := Seq("-deprecation", "-feature", "-Xfatal-warnings", "-Ymacro-annotations"))
-      .settings(
-        scalaJSUseMainModuleInitializer := true
-      )
-      .settings(
-        publish := {},
-        publishLocal := {}
-      )
+def demoProject(p: Project): Project =
+  p.enablePlugins(ScalaJSBundlerPlugin)
+    .settings(commonSettings)
+    .settings(scalacOptions := Seq("-deprecation", "-feature", "-Xfatal-warnings", "-Ymacro-annotations"))
+    .settings(
+      scalaJSUseMainModuleInitializer := true
+    )
+    .settings(
+      publish := {},
+      publishLocal := {}
+    )

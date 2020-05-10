@@ -8,7 +8,8 @@ case class Module(name: String,
                   functions: Option[List[Function]],
                   imports: Option[List[String]],
                   customAttributes: Option[List[CustomAttribute]],
-                  elements: List[Element]) {
+                  elements: List[Element]
+) {
 
   def pkg = s"$parent.$name"
 
@@ -28,7 +29,8 @@ case class Element(name: String,
                    splitted: Option[List[Element]],
                    wrap: Option[String],
                    imports: Option[List[String]],
-                   props: Option[List[String]]) {
+                   props: Option[List[String]]
+) {
 
   private def ucFirst(str: String) = str.take(1).toUpperCase().appendedAll(str.drop(1))
 
@@ -40,10 +42,11 @@ case class Element(name: String,
       props = Option(List(orig.props.getOrElse(Seq.empty), split.props.getOrElse(Seq.empty)).flatten)
     )
 
-  def components = splitted match {
-    case None => Seq(this)
-    case Some(splits) => splits.map(split => merge(this, split))
-  }
+  def components =
+    splitted match {
+      case None => Seq(this)
+      case Some(splits) => splits.map(split => merge(this, split))
+    }
 
   def dom = s"${name}DOM"
 
