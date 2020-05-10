@@ -17,14 +17,15 @@ class ModuleFinder extends SimpleFileVisitor[Path] with LazyLogging {
   def modules: List[File] = moduleFiles.map(_.toFile())
 
   override def visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult = {
-
-    moduleFiles = moduleFiles :+ file
-
+    if (file.getFileName().toString().endsWith(".json") || file.getFileName().toString().endsWith(".conf"))
+      moduleFiles = moduleFiles :+ file
     FileVisitResult.CONTINUE
   }
 
   override def preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult =
     if (Files.exists(dir.resolveSibling(s"${dir.getFileName.toString}.json")))
+      FileVisitResult.SKIP_SUBTREE
+    else if (Files.exists(dir.resolveSibling(s"${dir.getFileName.toString}.conf")))
       FileVisitResult.SKIP_SUBTREE
     else FileVisitResult.CONTINUE
 

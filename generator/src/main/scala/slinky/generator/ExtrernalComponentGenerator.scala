@@ -23,6 +23,11 @@ import java.io.FileInputStream
 import java.nio.file.Path
 import scala.util.Using
 import java.io.PrintWriter
+
+import pureconfig._
+import pureconfig.generic.auto._
+import slinky.generator.model.Elements
+
 object ExtrernalComponentGenerator extends App with Utils {
 
   parser.parse(args, Config()) match {
@@ -32,22 +37,45 @@ object ExtrernalComponentGenerator extends App with Utils {
       config.modules.foreach { moduleFile =>
         logger.debug(s"\t* ${moduleFile.getName()}")
 
-        decodeFile[Module](moduleFile) match {
-
-          case Left(e) =>
-            e match {
-              case ParsingFailure(message, underlying) =>
-                logger.error(s"Could not parse Module info $message", underlying.getMessage())
-              case DecodingFailure(message, _) =>
-                logger.error(s"Could not parse Module info $message")
-
-            }
-          case Right(module) =>
-            val generator = new ExtrernalComponentGenerator(config.target)
-            generator.processModule(moduleFile, module, new File(config.srcManaged, module.name))
+        moduleFile match {
+          case json if json.getName().endsWith(".json") =>
+            jsonFile(config, moduleFile)
+          case conf if conf.getName().endsWith(".conf") =>
+            confFile(config, moduleFile)
         }
+
       }
   }
+
+  def confFile(config: Config, moduleFile: File): Unit =
+    ConfigSource.file(moduleFile).withFallback(ConfigSource.resources("module.conf")).load[Module] match {
+      case Left(e) =>
+        e.toList.foreach { er =>
+          logger.error(er.description)
+        }
+      case Right(module) =>
+        processModule(config, moduleFile, module)
+    }
+  def jsonFile(config: Config, moduleFile: File): Unit =
+    decodeFile[Module](moduleFile) match {
+
+      case Left(e) =>
+        e match {
+          case ParsingFailure(message, underlying) =>
+            logger.error(s"Could not parse Module info $message", underlying.getMessage())
+          case DecodingFailure(message, _) =>
+            logger.error(s"Could not parse Module info $message")
+
+        }
+      case Right(module) =>
+        processModule(config, moduleFile, module)
+    }
+
+  def processModule(config: Config, moduleFile: File, module: Module): Unit = {
+    val generator = new ExtrernalComponentGenerator(config.target)
+    generator.processModule(moduleFile, module, new File(config.srcManaged, module.name))
+  }
+
 }
 
 class ExtrernalComponentGenerator(target: File) extends Utils {
@@ -99,13 +127,19 @@ class ExtrernalComponentGenerator(target: File) extends Utils {
         .toScala(LazyList)
         .filter(file => needProcessing(module, file.toFile()))
         .foreach { elementsFile =>
-          val elements = decodeFile[List[Element]](elementsFile.toFile())
-          elements.foreach(elements =>
-            elements.foreach { element =>
-              processElement(module, element, outputFolder)
-              writeDigest(module, elementsFile.toFile())
-            }
-          )
+          val elements = ConfigSource.file(elementsFile).load[Elements]
+          elements match {
+            case Left(e) =>
+              e.toList.foreach { er =>
+                logger.error(er.description)
+              }
+            case Right(elements) =>
+              elements.elements.foreach { element =>
+                processElement(module, element, outputFolder)
+                writeDigest(module, elementsFile.toFile())
+              }
+
+          }
         }
 
   }
@@ -185,33 +219,31 @@ class ExtrernalComponentGenerator(target: File) extends Utils {
 
   def processEnum(enums: List[Enum])(implicit output: IndentWriter) =
     enums.foreach { enum_ =>
-      enum_.typeAlias match {
-        case Some(typeAlias) =>
-          begin(s"object ${enum_.name}") { implicit output =>
-            enum_.escapedValues.foreach(value => outln(s"case object $value"))
-            typeAlias.foreach { alias =>
-              outln(
-                s"type ${alias.name} = ${alias.escapedValues
-                  .getOrElse(enum_.escapedValues)
-                  .map {
-                    case "Boolean" => "Boolean"
-                    case v => s"$v.type"
-                  }
-                  .mkString(" | ")}"
-              )
-              out(s"implicit val ${alias.name}Writer: Writer[${alias.name}] = ")
-              outln(alias.writer.getOrElse("_.toString.asInstanceOf[js.Object]"))
-            }
-          }
-        case None =>
-          outln(s"sealed trait ${enum_.name}")
-          begin(s"object ${enum_.name}") { implicit output =>
-            enum_.escapedValues.foreach(value => outln(s"case object $value extends ${enum_.name}"))
+      if (enum_.typeAlias.isEmpty) {
+        outln(s"sealed trait ${enum_.name}")
+        begin(s"object ${enum_.name}") { implicit output =>
+          enum_.escapedValues.foreach(value => outln(s"case object $value extends ${enum_.name}"))
+          outln(
+            s"implicit val a${enum_.name}Writer: Writer[${enum_.name}] = _.toString.asInstanceOf[js.Object]"
+          )
+        }
+      } else
+        begin(s"object ${enum_.name}") { implicit output =>
+          enum_.escapedValues.foreach(value => outln(s"case object $value"))
+          enum_.typeAlias.foreach { alias =>
             outln(
-              s"implicit val a${enum_.name}Writer: Writer[${enum_.name}] = _.toString.asInstanceOf[js.Object]"
+              s"type ${alias.name} = ${alias.escapedValues
+                .getOrElse(enum_.escapedValues)
+                .map {
+                  case "Boolean" => "Boolean"
+                  case v => s"$v.type"
+                }
+                .mkString(" | ")}"
             )
+            out(s"implicit val ${alias.name}Writer: Writer[${alias.name}] = ")
+            outln(alias.writer.getOrElse("_.toString.asInstanceOf[js.Object]"))
           }
-      }
+        }
 
     }
 

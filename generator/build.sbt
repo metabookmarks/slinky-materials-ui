@@ -1,5 +1,6 @@
 libraryDependencies += "net.ruippeixotog" %% "scala-scraper" % "2.2.0"
 libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2"
+libraryDependencies += "com.github.pureconfig" %% "pureconfig" % "0.12.3"
 libraryDependencies += "io.circe" %% "circe-core" % "0.13.0"
 libraryDependencies += "io.circe" %% "circe-generic" % "0.13.0"
 libraryDependencies += "io.circe" %% "circe-parser" % "0.13.0"

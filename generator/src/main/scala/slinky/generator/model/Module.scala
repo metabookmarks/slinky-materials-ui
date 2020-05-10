@@ -17,6 +17,15 @@ case class Module(name: String,
 
 }
 
+case class Elements(
+    enums: Option[List[Enum]],
+    objects: Option[List[String]],
+    functions: Option[List[Function]],
+    imports: Option[List[String]],
+    customAttributes: Option[List[CustomAttribute]],
+    elements: List[Element]
+)
+
 case class Function(name: String, args: List[String], partials: Option[Int]) {
 
   def scala(mod: String) =
@@ -81,6 +90,6 @@ trait EscapedValues {
 case class TypeAlias(name: String, values: Option[List[String]], writer: Option[String]) extends EscapedValues {
   def escapedValues = values.map(escapeValues)
 }
-case class Enum(name: String, values: List[String], typeAlias: Option[List[TypeAlias]]) extends EscapedValues {
+case class Enum(name: String, values: List[String], typeAlias: List[TypeAlias]) extends EscapedValues {
   def escapedValues = escapeValues(values)
 }
