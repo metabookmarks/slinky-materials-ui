@@ -156,6 +156,9 @@ lazy val `material-ui` = project
     crossScalaSettings
   )
   .settings(
+    npmExtraArgs ++= Seq(
+      "--registry=https://nexus.local/nexus/content/groups/npm-public/"
+    ),
     libraryDependencies ++= Seq(
         "org.scala-js" %%% "scalajs-dom" % "1.0.0"
       ),
@@ -197,12 +200,17 @@ lazy val server = project
     publishLocal := {}
   )
 
+def npmNexus = sys.env.get("NEXUS").map(url=>npmExtraArgs ++= Seq(
+      s"--registry=$url/repository/npm-public/"
+    )).toSeq
+
 lazy val client = project
   .in(file("demo-akka-http/client"))
   .enablePlugins(ScalaJSBundlerPlugin)
   .settings(commonSettings)
   .settings(scalacOptions := Seq("-deprecation", "-feature", "-Xfatal-warnings", "-Ymacro-annotations"))
   .settings(
+    npmNexus,
     scalaJSUseMainModuleInitializer := true
   )
   .dependsOn(sharedJs, `material-ui`)
@@ -232,7 +240,6 @@ lazy val sharedJvm = shared.jvm
 lazy val sharedJs = shared.js
 
 lazy val commonSettings = Seq(
-  scalaVersion := "2.13.1",
   organization := "io.metabookmarks"
 )
 
