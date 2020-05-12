@@ -1,21 +1,15 @@
-package slinky.generator
+package slinky.generator.externalcomponent
 
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.net.URI
 
-import io.circe.generic.auto._
-import io.circe.parser._
-import io.circe.jawn._
-
 import slinky.generator.model.{Element, Enum, Module}
 import scala.io.Source
 import scopt._
 import org.slf4j.LoggerFactory
 import slinky.generator.model.CustomAttribute
-import io.circe.ParsingFailure
-import io.circe.DecodingFailure
 import scala.jdk.StreamConverters._
 import org.apache.commons.codec.cli.Digest
 import org.apache.commons.codec.digest.DigestUtils
@@ -26,57 +20,10 @@ import java.io.PrintWriter
 
 import pureconfig._
 import pureconfig.generic.auto._
-import slinky.generator.model.Elements
-
-object ExtrernalComponentGenerator extends App with Utils {
-
-  parser.parse(args, Config()) match {
-    case None =>
-      logger.error(parser.usage)
-    case Some(config) =>
-      config.modules.foreach { moduleFile =>
-        logger.debug(s"\t* ${moduleFile.getName()}")
-
-        moduleFile match {
-          case json if json.getName().endsWith(".json") =>
-            jsonFile(config, moduleFile)
-          case conf if conf.getName().endsWith(".conf") =>
-            confFile(config, moduleFile)
-        }
-
-      }
-  }
-
-  def confFile(config: Config, moduleFile: File): Unit =
-    ConfigSource.file(moduleFile).withFallback(ConfigSource.resources("module.conf")).load[Module] match {
-      case Left(e) =>
-        e.toList.foreach { er =>
-          logger.error(er.description)
-        }
-      case Right(module) =>
-        processModule(config, moduleFile, module)
-    }
-  def jsonFile(config: Config, moduleFile: File): Unit =
-    decodeFile[Module](moduleFile) match {
-
-      case Left(e) =>
-        e match {
-          case ParsingFailure(message, underlying) =>
-            logger.error(s"Could not parse Module info $message", underlying.getMessage())
-          case DecodingFailure(message, _) =>
-            logger.error(s"Could not parse Module info $message")
-
-        }
-      case Right(module) =>
-        processModule(config, moduleFile, module)
-    }
-
-  def processModule(config: Config, moduleFile: File, module: Module): Unit = {
-    val generator = new ExtrernalComponentGenerator(config.target)
-    generator.processModule(moduleFile, module, new File(config.srcManaged, module.name))
-  }
-
-}
+import slinky.generator.model._
+import com.typesafe.scalalogging.LazyLogging
+import slinky.generator.IndentWriter
+import slinky.generator.Utils
 
 class ExtrernalComponentGenerator(target: File) extends Utils {
 
@@ -163,7 +110,9 @@ class ExtrernalComponentGenerator(target: File) extends Utils {
         }
     }
 
-  def processFunctions(module: Module)(functions: List[model.Function])(implicit output: IndentWriter) = {
+  def processFunctions(
+      module: Module
+  )(functions: List[Function])(implicit output: IndentWriter) = {
     outln("@js.native")
     outln(s"""@JSImport("${module.npm}", JSImport.Default)""")
     begin(s"object ${module.mod} extends js.Any") { implicit output =>

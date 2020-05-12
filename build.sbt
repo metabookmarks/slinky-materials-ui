@@ -134,7 +134,7 @@ lazy val `material-ui` = project
           (generator / Compile / runMain)
             .toTask {
               Seq(
-                "slinky.generator.ExtrernalComponentGenerator",
+                "slinky.generator.ExtrernalComponent",
                 "--target",
                 target.value,
                 "--src-managed",
