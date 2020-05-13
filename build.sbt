@@ -32,8 +32,7 @@ lazy val slinkyMaterial = project
     sharedJvm
   )
   .settings(
-    publish := {},
-    publishLocal := {}
+   skipPublishSettings
   )
 
 lazy val librarySettings = Seq(
@@ -63,32 +62,18 @@ lazy val librarySettings = Seq(
     )
 )
 
-lazy val crossScalaSettings = Seq(
-  crossScalaVersions := Seq(scala213),
-  Compile / unmanagedSourceDirectories += {
-    val sourceDir = (Compile / sourceDirectory).value
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, n)) if n >= 13 => sourceDir / "scala-2.13+"
-      case _ => sourceDir / "scala-2.13-"
-    }
-  },
-  Test / unmanagedSourceDirectories += {
-    val sourceDir = (Test / sourceDirectory).value
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, n)) if n >= 13 => sourceDir / "scala-2.13+"
-      case _ => sourceDir / "scala-2.13-"
-    }
-  }
-)
 
 lazy val generator = project
   .settings(
-    libraryDependencies ++= Seq("com.github.scopt" %% "scopt" % "3.7.1", "ch.qos.logback" % "logback-classic" % "1.2.3")
+    libraryDependencies ++= Seq(
+        "com.github.scopt" %% "scopt" % "3.7.1",
+        "ch.qos.logback" % "logback-classic" % "1.2.3",
+        "org.netbeans.external" % "org-apache-commons-codec" % "RELEASE113",
+        "com.typesafe.scala-logging" %% "scala-logging" % "3.9.2",
+        "com.github.pureconfig" %% "pureconfig" % "0.12.3"
+      )
   )
-  .settings(
-    publish := {},
-    publishLocal := {}
-  )
+  .settings(skipPublishSettings)
 
 lazy val `material-components-web` = project
   .in(file("material-components-web"))
@@ -102,8 +87,7 @@ lazy val `material-components-web` = project
     normalizedName := "material-components-web"
   )
   .settings(
-    librarySettings,
-    crossScalaSettings
+    librarySettings
   )
   .settings(
     libraryDependencies ++= Seq(
@@ -114,9 +98,7 @@ lazy val `material-components-web` = project
     Compile / npmDependencies += "react-dom" -> "16.13.1"
   )
 
-lazy val `material-ui` = project
-  .in(file("material-ui"))
-  .enablePlugins(ScalaJSBundlerPlugin)
+lazy val `material-ui` = scalajsProject("material-ui")
   .settings(
     libraryDependencies ++= Seq(
         "org.scala-js" %%% "scalajs-dom" % "1.0.0",
@@ -141,7 +123,6 @@ lazy val `material-ui` = project
                 rootFolder,
                 "--modulesPath",
                 s"${baseDir.getAbsolutePath}/src/main/npm"
-//              ++ (baseDir / "src/main/npm/material" * "*.json").get.toList)
               ).mkString(" ", " ", "")
             }
             .map(_ => (rootFolder ** "*.scala").get)
@@ -152,13 +133,12 @@ lazy val `material-ui` = project
       val files = (Compile / managedSources).value
       files.map(f => (f, f.relativeTo(base).get.getPath))
     },
-    librarySettings,
-    crossScalaSettings
+    librarySettings
   )
   .settings(
     npmExtraArgs ++= Seq(
-      "--registry=https://nexus.local/nexus/content/groups/npm-public/"
-    ),
+        "--registry=https://nexus.local/nexus/content/groups/npm-public/"
+      ),
     libraryDependencies ++= Seq(
         "org.scala-js" %%% "scalajs-dom" % "1.0.0"
       ),
@@ -178,7 +158,6 @@ lazy val `material-ui` = project
 lazy val server = project
   .in(file("demo-akka-http/server"))
   .enablePlugins(SbtWeb, SbtTwirl, JavaAppPackaging, WebScalaJSBundlerPlugin)
-  .settings(commonSettings)
   .settings(
     scalaJSProjects := Seq(client, `mdc-demo`),
     pipelineStages in Assets := Seq(scalaJSPipeline),
@@ -195,43 +174,32 @@ lazy val server = project
     EclipseKeys.preTasks := Seq(compile in Compile)
   )
   .dependsOn(sharedJvm, client)
-  .settings(
-    publish := {},
-    publishLocal := {}
-  )
+  .settings(skipPublishSettings)
 
-def npmNexus = sys.env.get("NEXUS").map(url=>npmExtraArgs ++= Seq(
-      s"--registry=$url/repository/npm-public/"
-    )).toSeq
+val skipPublishSettings = Seq(
+   publish := {},
+   publishLocal := {}
+)
 
-lazy val client = project
-  .in(file("demo-akka-http/client"))
-  .enablePlugins(ScalaJSBundlerPlugin)
-  .settings(commonSettings)
-  .settings(scalacOptions := Seq("-deprecation", "-feature", "-Xfatal-warnings", "-Ymacro-annotations"))
-  .settings(
-    npmNexus,
-    scalaJSUseMainModuleInitializer := true
-  )
+def npmNexus =
+  sys.env
+    .get("NEXUS")
+    .map(url =>
+      npmExtraArgs ++= Seq(
+          s"--registry=$url/repository/npm-public/"
+        )
+    )
+    .toSeq
+
+lazy val client = demoProject("client")
   .dependsOn(sharedJs, `material-ui`)
-  .settings(
-    scalacOptions += slinkySourceMap
-  )
-  .settings(
-    publish := {},
-    publishLocal := {}
-  )
 
-lazy val `mdc-demo` = demoProject(project in file(s"demo-akka-http/mdc-demo"))
+lazy val `mdc-demo` = demoProject("mdc-demo")
   .dependsOn(sharedJs, `material-components-web`)
-  .settings(
-    scalacOptions += slinkySourceMap
-  )
 
 lazy val shared = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("demo-akka-http/shared"))
-  .settings(commonSettings)
   .settings(
     publish := {},
     publishLocal := {}
@@ -239,21 +207,22 @@ lazy val shared = crossProject(JSPlatform, JVMPlatform)
 lazy val sharedJvm = shared.jvm
 lazy val sharedJs = shared.js
 
-lazy val commonSettings = Seq(
-  organization := "io.metabookmarks"
-)
-
 Global / cancelable := true
 fork in Global := true
-// loads the server project at sbt startup
-//onLoad in Global := (onLoad in Global).value.andThen(state => "project server" :: state)
 
-def demoProject(p: Project): Project =
-  p.enablePlugins(ScalaJSBundlerPlugin)
-    .settings(commonSettings)
+def scalajsProject(projectId: String, baseDir: String = "."): Project =
+  Project(id = projectId, base = file(s"$baseDir/$projectId"))
+    .enablePlugins(ScalaJSBundlerPlugin)
     .settings(scalacOptions := Seq("-deprecation", "-feature", "-Xfatal-warnings", "-Ymacro-annotations"))
+    .settings(npmNexus)
+
+def demoProject(projectId: String): Project =
+  scalajsProject(projectId, "demo-akka-http")
     .settings(
       scalaJSUseMainModuleInitializer := true
+    )
+    .settings(
+      scalacOptions += slinkySourceMap
     )
     .settings(
       publish := {},
