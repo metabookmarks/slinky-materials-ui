@@ -90,9 +90,6 @@ lazy val `material-components-web` = project
     librarySettings
   )
   .settings(
-    libraryDependencies ++= Seq(
-        "org.scala-js" %%% "scalajs-dom" % "1.0.0"
-      ),
     Compile / npmDependencies += "material-components-web" -> "6.0.0",
     Compile / npmDependencies += "react" -> "16.13.1",
     Compile / npmDependencies += "react-dom" -> "16.13.1"
@@ -138,9 +135,6 @@ lazy val `material-ui` = scalajsProject("material-ui")
   .settings(
     npmExtraArgs ++= Seq(
         "--registry=https://nexus.local/nexus/content/groups/npm-public/"
-      ),
-    libraryDependencies ++= Seq(
-        "org.scala-js" %%% "scalajs-dom" % "1.0.0"
       ),
     Compile / npmDependencies += "material-components-web" -> "6.0.0",
     Compile / npmDependencies += "react" -> "16.13.1",
@@ -200,10 +194,8 @@ lazy val `mdc-demo` = demoProject("mdc-demo")
 lazy val shared = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("demo-akka-http/shared"))
-  .settings(
-    publish := {},
-    publishLocal := {}
-  )
+  settings(skipPublishSettings)
+
 lazy val sharedJvm = shared.jvm
 lazy val sharedJs = shared.js
 
@@ -224,7 +216,4 @@ def demoProject(projectId: String): Project =
     .settings(
       scalacOptions += slinkySourceMap
     )
-    .settings(
-      publish := {},
-      publishLocal := {}
-    )
+    settings(skipPublishSettings)
