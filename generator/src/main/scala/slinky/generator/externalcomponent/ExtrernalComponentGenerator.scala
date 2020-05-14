@@ -248,6 +248,9 @@ class ExtrernalComponentGenerator(target: File) extends Utils {
     outln("import org.scalajs.dom.raw._")
     outln("import slinky.web.SyntheticMouseEvent")
 
+    if (element.props.isEmpty)
+      outln("import slinky.core.ExternalComponentNoProps")
+
     module.imports.foreach(imports => imports.foreach(imp => outln(s"import $imp")))
     element.imports.foreach(imports => imports.foreach(imp => outln(s"import $imp")))
 

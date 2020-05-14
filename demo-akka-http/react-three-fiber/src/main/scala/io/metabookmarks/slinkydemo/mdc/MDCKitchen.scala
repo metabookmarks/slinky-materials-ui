@@ -23,9 +23,25 @@ import slinky.web.svg.format
 import slinky.core.facade.React
 import slinky.core.facade.Hooks._
 import slinky.core.FunctionalComponent
+import slinky.threefiber.threeFiber.Canvas
+
+
+@react object ThreeFiber {
+  case class Props(i: Int)
+
+  val component = FunctionalComponent[Props]{ props =>
+
+    Canvas()
+
+  }
+}
+
 
 object MDCKitchen {
 
   def main(args: Array[String]): Unit =
-    Option(dom.document.getElementById("here")).foreach(container => container.innerHTML = "coucou mdc")
+    Option(dom.document.getElementById("here")).foreach{
+      container => 
+        ReactDOM.render(ThreeFiber(1), container)
+    }
 }

@@ -25,9 +25,10 @@ lazy val slinkyMaterial = project
   .aggregate(
     generator,
     `material-ui`,
+    `react-three-fiber`,
     server,
     client,
-    `mdc-demo`,
+    `react-three-fiber-demo`,
     sharedJs,
     sharedJvm
   )
@@ -75,24 +76,9 @@ lazy val generator = project
   )
   .settings(skipPublishSettings)
 
-lazy val `material-components-web` = project
-  .in(file("material-components-web"))
-  .enablePlugins(ScalaJSBundlerPlugin)
+lazy val `react-three-fiber` = libraryProject("react-three-fiber")
   .settings(
-    libraryDependencies ++= Seq(
-        "org.scala-js" %%% "scalajs-dom" % "1.0.0",
-        "me.shadaj" %%% "slinky-core" % slinkyVersion, // core React functionality, no React DOM
-        "me.shadaj" %%% "slinky-web" % slinkyVersion
-      ),
-    normalizedName := "material-components-web"
-  )
-  .settings(
-    librarySettings
-  )
-  .settings(
-    Compile / npmDependencies += "material-components-web" -> "6.0.0",
-    Compile / npmDependencies += "react" -> "16.13.1",
-    Compile / npmDependencies += "react-dom" -> "16.13.1"
+    Compile / npmDependencies += "react-three-fiber" -> "4.2.4"
   )
 
 lazy val `material-ui` = scalajsProject("material-ui")
@@ -153,7 +139,7 @@ lazy val server = project
   .in(file("demo-akka-http/server"))
   .enablePlugins(SbtWeb, SbtTwirl, JavaAppPackaging, WebScalaJSBundlerPlugin)
   .settings(
-    scalaJSProjects := Seq(client, `mdc-demo`),
+    scalaJSProjects := Seq(client, `react-three-fiber-demo`),
     pipelineStages in Assets := Seq(scalaJSPipeline),
     // triggers scalaJSPipeline when using compile or continuous compilation
     compile in Compile := ((compile in Compile) dependsOn scalaJSPipeline).value,
@@ -188,13 +174,13 @@ def npmNexus =
 lazy val client = demoProject("client")
   .dependsOn(sharedJs, `material-ui`)
 
-lazy val `mdc-demo` = demoProject("mdc-demo")
-  .dependsOn(sharedJs, `material-components-web`)
+lazy val `react-three-fiber-demo` = demoProject("react-three-fiber")
+  .dependsOn(sharedJs, `react-three-fiber`)
 
 lazy val shared = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("demo-akka-http/shared"))
-  settings(skipPublishSettings)
+  .settings(skipPublishSettings)
 
 lazy val sharedJvm = shared.jvm
 lazy val sharedJs = shared.js
@@ -202,18 +188,64 @@ lazy val sharedJs = shared.js
 Global / cancelable := true
 fork in Global := true
 
-def scalajsProject(projectId: String, baseDir: String = "."): Project =
-  Project(id = projectId, base = file(s"$baseDir/$projectId"))
+def scalajsProject(projectId: String, suffix: String = "", baseDir: String = "."): Project =
+  Project(id = s"$projectId$suffix", base = file(s"$baseDir/$projectId"))
     .enablePlugins(ScalaJSBundlerPlugin)
     .settings(scalacOptions := Seq("-deprecation", "-feature", "-Xfatal-warnings", "-Ymacro-annotations"))
     .settings(npmNexus)
 
+def libraryProject(projectId: String): Project =
+ scalajsProject(projectId)
+   .settings(
+    libraryDependencies ++= Seq(
+        "org.scala-js" %%% "scalajs-dom" % "1.0.0",
+        "me.shadaj" %%% "slinky-core" % slinkyVersion, // core React functionality, no React DOM
+        "me.shadaj" %%% "slinky-web" % slinkyVersion
+      ),
+    normalizedName := projectId
+  )
+  .settings(
+    Compile / sourceGenerators += Def
+        .taskDyn[Seq[File]] {
+          val baseDir = baseDirectory.value
+          val rootFolder = (Compile / sourceManaged).value / "slinky" / projectId
+          rootFolder.mkdirs()
+          (generator / Compile / runMain)
+            .toTask {
+              Seq(
+                "slinky.generator.ExtrernalComponent",
+                "--target",
+                target.value,
+                "--src-managed",
+                rootFolder,
+                "--modulesPath",
+                s"${baseDir.getAbsolutePath}/src/main/npm"
+              ).mkString(" ", " ", "")
+            }
+            .map(_ => (rootFolder ** "*.scala").get)
+        }
+        .taskValue,
+    Compile / packageSrc / mappings ++= {
+      val base = (Compile / sourceManaged).value
+      val files = (Compile / managedSources).value
+      files.map(f => (f, f.relativeTo(base).get.getPath))
+    },
+    librarySettings
+  )
+  .settings(
+    npmExtraArgs ++= Seq(
+        "--registry=https://nexus.local/nexus/content/groups/npm-public/"
+      ),
+    Compile / npmDependencies += "react" -> "16.13.1",
+    Compile / npmDependencies += "react-dom" -> "16.13.1"
+  )
+
 def demoProject(projectId: String): Project =
-  scalajsProject(projectId, "demo-akka-http")
+  scalajsProject(projectId, "-demo", "demo-akka-http")
     .settings(
       scalaJSUseMainModuleInitializer := true
     )
     .settings(
       scalacOptions += slinkySourceMap
     )
-    settings(skipPublishSettings)
+    .settings(skipPublishSettings)
