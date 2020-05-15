@@ -72,9 +72,7 @@ lazy val generator = project
     publishLocal := {}
   )
 
-lazy val `material-components-web` = project
-  .in(file("material-components-web"))
-  .enablePlugins(ScalaJSBundlerPlugin)
+lazy val `material-components-web` = scalajsProject("material-components-web")
   .settings(
     libraryDependencies ++= Seq(
         "org.scala-js" %%% "scalajs-dom" % "1.0.0",
@@ -87,17 +85,12 @@ lazy val `material-components-web` = project
     librarySettings
   )
   .settings(
-    libraryDependencies ++= Seq(
-        "org.scala-js" %%% "scalajs-dom" % "1.0.0"
-      ),
     Compile / npmDependencies += "material-components-web" -> "6.0.0",
     Compile / npmDependencies += "react" -> "16.13.1",
     Compile / npmDependencies += "react-dom" -> "16.13.1"
   )
 
-lazy val `material-ui` = project
-  .in(file("material-ui"))
-  .enablePlugins(ScalaJSBundlerPlugin)
+lazy val `material-ui` = scalajsProject("material-ui")
   .settings(
     libraryDependencies ++= Seq(
         "org.scala-js" %%% "scalajs-dom" % "1.0.0",
@@ -136,12 +129,6 @@ lazy val `material-ui` = project
     librarySettings
   )
   .settings(
-    npmExtraArgs ++= Seq(
-      "--registry=https://nexus.local/nexus/content/groups/npm-public/"
-    ),
-    libraryDependencies ++= Seq(
-        "org.scala-js" %%% "scalajs-dom" % "1.0.0"
-      ),
     Compile / npmDependencies += "material-components-web" -> "6.0.0",
     Compile / npmDependencies += "react" -> "16.13.1",
     Compile / npmDependencies += "react-dom" -> "16.13.1",
@@ -179,7 +166,6 @@ lazy val server = project
     publishLocal := {}
   )
 
-
 lazy val client = demoProject("client")
   .dependsOn(sharedJs, `material-ui`)
   .settings(
@@ -206,23 +192,28 @@ lazy val shared = crossProject(JSPlatform, JVMPlatform)
 lazy val sharedJvm = shared.jvm
 lazy val sharedJs = shared.js
 
-
 Global / cancelable := true
 fork in Global := true
 // loads the server project at sbt startup
 //onLoad in Global := (onLoad in Global).value.andThen(state => "project server" :: state)
 
-def scalajsProject(projectId: String, baseDir: String="."): Project =
-  Project(id=projectId, base=file(s"$baseDir/$projectId"))
+def scalajsProject(projectId: String, baseDir: String = "."): Project =
+  Project(id = projectId, base = file(s"$baseDir/$projectId"))
     .enablePlugins(ScalaJSBundlerPlugin)
-    .settings(sys.env.get("NEXUS").map(url=>npmExtraArgs ++= Seq(
-      s"--registry=$url/repository/npm-public/"
-    )).toSeq)
+    .settings(
+      sys.env
+        .get("NEXUS")
+        .map(url =>
+          npmExtraArgs ++= Seq(
+              s"--registry=$url/repository/npm-public/"
+            )
+        )
+        .toSeq
+    )
     .settings(scalacOptions := Seq("-deprecation", "-feature", "-Xfatal-warnings", "-Ymacro-annotations"))
 
-
 def demoProject(projectId: String): Project =
-    scalajsProject(projectId, "demo-akka-http")
+  scalajsProject(projectId, "demo-akka-http")
     .settings(
       scalaJSUseMainModuleInitializer := true
     )
