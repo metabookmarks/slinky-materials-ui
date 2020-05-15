@@ -158,7 +158,6 @@ lazy val `material-ui` = project
 lazy val server = project
   .in(file("demo-akka-http/server"))
   .enablePlugins(SbtWeb, SbtTwirl, JavaAppPackaging, WebScalaJSBundlerPlugin)
-  .settings(commonSettings)
   .settings(
     scalaJSProjects := Seq(client, `mdc-demo`),
     pipelineStages in Assets := Seq(scalaJSPipeline),
@@ -180,9 +179,6 @@ lazy val server = project
     publishLocal := {}
   )
 
-def npmNexus = sys.env.get("NEXUS").map(url=>npmExtraArgs ++= Seq(
-      s"--registry=$url/repository/npm-public/"
-    )).toSeq
 
 lazy val client = demoProject("client")
   .dependsOn(sharedJs, `material-ui`)
@@ -203,7 +199,6 @@ lazy val `mdc-demo` = demoProject("mdc-demo")
 lazy val shared = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .in(file("demo-akka-http/shared"))
-  .settings(commonSettings)
   .settings(
     publish := {},
     publishLocal := {}
@@ -211,21 +206,23 @@ lazy val shared = crossProject(JSPlatform, JVMPlatform)
 lazy val sharedJvm = shared.jvm
 lazy val sharedJs = shared.js
 
-lazy val commonSettings = Seq(
-  organization := "io.metabookmarks"
-)
 
 Global / cancelable := true
 fork in Global := true
 // loads the server project at sbt startup
 //onLoad in Global := (onLoad in Global).value.andThen(state => "project server" :: state)
 
-def demoProject(projectId: String): Project =
-  Project(id=projectId, base=file(s"demo-akka-http/$projectId"))
+def scalajsProject(projectId: String, baseDir: String="."): Project =
+  Project(id=projectId, base=file(s"$baseDir/$projectId"))
     .enablePlugins(ScalaJSBundlerPlugin)
-    .settings(npmNexus)
-    .settings(commonSettings)
+    .settings(sys.env.get("NEXUS").map(url=>npmExtraArgs ++= Seq(
+      s"--registry=$url/repository/npm-public/"
+    )).toSeq)
     .settings(scalacOptions := Seq("-deprecation", "-feature", "-Xfatal-warnings", "-Ymacro-annotations"))
+
+
+def demoProject(projectId: String): Project =
+    scalajsProject(projectId, "demo-akka-http")
     .settings(
       scalaJSUseMainModuleInitializer := true
     )
