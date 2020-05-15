@@ -90,43 +90,9 @@ lazy val `material-components-web` = scalajsProject("material-components-web")
     Compile / npmDependencies += "react-dom" -> "16.13.1"
   )
 
-lazy val `material-ui` = scalajsProject("material-ui")
+lazy val `material-ui` = slinkyWrapperProject("material-ui")
   .settings(
-    libraryDependencies ++= Seq(
-        "org.scala-js" %%% "scalajs-dom" % "1.0.0",
-        "me.shadaj" %%% "slinky-core" % slinkyVersion, // core React functionality, no React DOM
-        "me.shadaj" %%% "slinky-web" % slinkyVersion
-      ),
     normalizedName := "slinky-material-ui"
-  )
-  .settings(
-    Compile / sourceGenerators += Def
-        .taskDyn[Seq[File]] {
-          val baseDir = baseDirectory.value
-          val rootFolder = (Compile / sourceManaged).value / "slinky/material-ui"
-          rootFolder.mkdirs()
-          (generator / Compile / runMain)
-            .toTask {
-              Seq(
-                "slinky.generator.ExtrernalComponent",
-                "--target",
-                target.value,
-                "--src-managed",
-                rootFolder,
-                "--modulesPath",
-                s"${baseDir.getAbsolutePath}/src/main/npm"
-//              ++ (baseDir / "src/main/npm/material" * "*.json").get.toList)
-              ).mkString(" ", " ", "")
-            }
-            .map(_ => (rootFolder ** "*.scala").get)
-        }
-        .taskValue,
-    Compile / packageSrc / mappings ++= {
-      val base = (Compile / sourceManaged).value
-      val files = (Compile / managedSources).value
-      files.map(f => (f, f.relativeTo(base).get.getPath))
-    },
-    librarySettings
   )
   .settings(
     Compile / npmDependencies += "material-components-web" -> "6.0.0",
@@ -196,6 +162,46 @@ Global / cancelable := true
 fork in Global := true
 // loads the server project at sbt startup
 //onLoad in Global := (onLoad in Global).value.andThen(state => "project server" :: state)
+
+
+def slinkyWrapperProject(projectId: String): Project =
+    scalajsProject(projectId)
+    .settings(
+    libraryDependencies ++= Seq(
+        "org.scala-js" %%% "scalajs-dom" % "1.0.0",
+        "me.shadaj" %%% "slinky-core" % slinkyVersion, // core React functionality, no React DOM
+        "me.shadaj" %%% "slinky-web" % slinkyVersion
+      )
+  )
+  .settings(
+    Compile / sourceGenerators += Def
+        .taskDyn[Seq[File]] {
+          val baseDir = baseDirectory.value
+          val rootFolder = (Compile / sourceManaged).value / "slinky/wrappers"
+          rootFolder.mkdirs()
+          (generator / Compile / runMain)
+            .toTask {
+              Seq(
+                "slinky.generator.ExtrernalComponent",
+                "--target",
+                target.value,
+                "--src-managed",
+                rootFolder,
+                "--modulesPath",
+                s"${baseDir.getAbsolutePath}/src/main/npm"
+              ).mkString(" ", " ", "")
+            }
+            .map(_ => (rootFolder ** "*.scala").get)
+        }
+        .taskValue,
+    Compile / packageSrc / mappings ++= {
+      val base = (Compile / sourceManaged).value
+      val files = (Compile / managedSources).value
+      files.map(f => (f, f.relativeTo(base).get.getPath))
+    },
+    librarySettings
+  )
+  
 
 def scalajsProject(projectId: String, baseDir: String = "."): Project =
   Project(id = projectId, base = file(s"$baseDir/$projectId"))
