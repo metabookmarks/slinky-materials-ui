@@ -63,24 +63,6 @@ lazy val librarySettings = Seq(
     )
 )
 
-lazy val crossScalaSettings = Seq(
-  crossScalaVersions := Seq(scala213),
-  Compile / unmanagedSourceDirectories += {
-    val sourceDir = (Compile / sourceDirectory).value
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, n)) if n >= 13 => sourceDir / "scala-2.13+"
-      case _ => sourceDir / "scala-2.13-"
-    }
-  },
-  Test / unmanagedSourceDirectories += {
-    val sourceDir = (Test / sourceDirectory).value
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, n)) if n >= 13 => sourceDir / "scala-2.13+"
-      case _ => sourceDir / "scala-2.13-"
-    }
-  }
-)
-
 lazy val generator = project
   .settings(
     libraryDependencies ++= Seq("com.github.scopt" %% "scopt" % "3.7.1", "ch.qos.logback" % "logback-classic" % "1.2.3")
@@ -102,8 +84,7 @@ lazy val `material-components-web` = project
     normalizedName := "material-components-web"
   )
   .settings(
-    librarySettings,
-    crossScalaSettings
+    librarySettings
   )
   .settings(
     libraryDependencies ++= Seq(
@@ -152,8 +133,7 @@ lazy val `material-ui` = project
       val files = (Compile / managedSources).value
       files.map(f => (f, f.relativeTo(base).get.getPath))
     },
-    librarySettings,
-    crossScalaSettings
+    librarySettings
   )
   .settings(
     npmExtraArgs ++= Seq(
@@ -204,15 +184,7 @@ def npmNexus = sys.env.get("NEXUS").map(url=>npmExtraArgs ++= Seq(
       s"--registry=$url/repository/npm-public/"
     )).toSeq
 
-lazy val client = project
-  .in(file("demo-akka-http/client"))
-  .enablePlugins(ScalaJSBundlerPlugin)
-  .settings(commonSettings)
-  .settings(scalacOptions := Seq("-deprecation", "-feature", "-Xfatal-warnings", "-Ymacro-annotations"))
-  .settings(
-    npmNexus,
-    scalaJSUseMainModuleInitializer := true
-  )
+lazy val client = demoProject("client")
   .dependsOn(sharedJs, `material-ui`)
   .settings(
     scalacOptions += slinkySourceMap
@@ -222,7 +194,7 @@ lazy val client = project
     publishLocal := {}
   )
 
-lazy val `mdc-demo` = demoProject(project in file(s"demo-akka-http/mdc-demo"))
+lazy val `mdc-demo` = demoProject("mdc-demo")
   .dependsOn(sharedJs, `material-components-web`)
   .settings(
     scalacOptions += slinkySourceMap
@@ -248,8 +220,10 @@ fork in Global := true
 // loads the server project at sbt startup
 //onLoad in Global := (onLoad in Global).value.andThen(state => "project server" :: state)
 
-def demoProject(p: Project): Project =
-  p.enablePlugins(ScalaJSBundlerPlugin)
+def demoProject(projectId: String): Project =
+  Project(id=projectId, base=file(s"demo-akka-http/$projectId"))
+    .enablePlugins(ScalaJSBundlerPlugin)
+    .settings(npmNexus)
     .settings(commonSettings)
     .settings(scalacOptions := Seq("-deprecation", "-feature", "-Xfatal-warnings", "-Ymacro-annotations"))
     .settings(
