@@ -163,59 +163,58 @@ fork in Global := true
 // loads the server project at sbt startup
 //onLoad in Global := (onLoad in Global).value.andThen(state => "project server" :: state)
 
-
 def slinkyWrapperProject(projectId: String): Project =
-    scalajsProject(projectId)
+  scalajsProject(projectId)
     .settings(
-    libraryDependencies ++= Seq(
-        "org.scala-js" %%% "scalajs-dom" % "1.0.0",
-        "me.shadaj" %%% "slinky-core" % slinkyVersion, // core React functionality, no React DOM
-        "me.shadaj" %%% "slinky-web" % slinkyVersion
-      )
-  )
-  .settings(
-    Compile / sourceGenerators += Def
-        .taskDyn[Seq[File]] {
-          val baseDir = baseDirectory.value
-          val rootFolder = (Compile / sourceManaged).value / "slinky/wrappers"
-          rootFolder.mkdirs()
-          (generator / Compile / runMain)
-            .toTask {
-              Seq(
-                "slinky.generator.ExtrernalComponent",
-                "--target",
-                target.value,
-                "--src-managed",
-                rootFolder,
-                "--modulesPath",
-                s"${baseDir.getAbsolutePath}/src/main/npm"
-              ).mkString(" ", " ", "")
-            }
-            .map(_ => (rootFolder ** "*.scala").get)
-        }
-        .taskValue,
-    Compile / packageSrc / mappings ++= {
-      val base = (Compile / sourceManaged).value
-      val files = (Compile / managedSources).value
-      files.map(f => (f, f.relativeTo(base).get.getPath))
-    },
-    librarySettings
-  )
-  
+      libraryDependencies ++= Seq(
+          "org.scala-js" %%% "scalajs-dom" % "1.0.0",
+          "me.shadaj" %%% "slinky-core" % slinkyVersion, // core React functionality, no React DOM
+          "me.shadaj" %%% "slinky-web" % slinkyVersion
+        )
+    )
+    .settings(
+      Compile / sourceGenerators += Def
+          .taskDyn[Seq[File]] {
+            val baseDir = baseDirectory.value
+            val rootFolder = (Compile / sourceManaged).value / "slinky/wrappers"
+            rootFolder.mkdirs()
+            (generator / Compile / runMain)
+              .toTask {
+                Seq(
+                  "slinky.generator.ExtrernalComponent",
+                  "--target",
+                  target.value,
+                  "--src-managed",
+                  rootFolder,
+                  "--modulesPath",
+                  s"${baseDir.getAbsolutePath}/src/main/npm"
+                ).mkString(" ", " ", "")
+              }
+              .map(_ => (rootFolder ** "*.scala").get)
+          }
+          .taskValue,
+      Compile / packageSrc / mappings ++= {
+        val base = (Compile / sourceManaged).value
+        val files = (Compile / managedSources).value
+        files.map(f => (f, f.relativeTo(base).get.getPath))
+      },
+      librarySettings
+    )
+
+def nexusNpmSettings =
+  sys.env
+    .get("NEXUS")
+    .map(url =>
+      npmExtraArgs ++= Seq(
+          s"--registry=$url/repository/npm-public/"
+        )
+    )
+    .toSeq
 
 def scalajsProject(projectId: String, baseDir: String = "."): Project =
   Project(id = projectId, base = file(s"$baseDir/$projectId"))
     .enablePlugins(ScalaJSBundlerPlugin)
-    .settings(
-      sys.env
-        .get("NEXUS")
-        .map(url =>
-          npmExtraArgs ++= Seq(
-              s"--registry=$url/repository/npm-public/"
-            )
-        )
-        .toSeq
-    )
+    .settings(nexusNpmSettings)
     .settings(scalacOptions := Seq("-deprecation", "-feature", "-Xfatal-warnings", "-Ymacro-annotations"))
 
 def demoProject(projectId: String): Project =
