@@ -226,7 +226,7 @@ class ExtrernalComponentGenerator(target: File) extends Utils {
             begin(s"@react object ${component.name} extends ${component.baseClass}") { implicit output =>
               component.props.foreach { props =>
                 out("case class Props(")
-                props.dropRight(1).foreach(prop => outln(s"  $prop,"))
+                props.dropRight(1).foreach(prop => outln(s"$prop,"))
                 outln(s"  ${props.last}")
                 outln(")")
               }
