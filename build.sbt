@@ -164,7 +164,8 @@ lazy val sharedJvm = shared.jvm
 lazy val sharedJs = shared.js
 
 Global / cancelable := true
-fork in Global := true
+fork in run := true
+fork in test := false
 // loads the server project at sbt startup
 //onLoad in Global := (onLoad in Global).value.andThen(state => "project server" :: state)
 
@@ -220,6 +221,7 @@ def scalajsProject(projectId: String, baseDir: String = "."): Project =
   Project(id = projectId, base = file(s"$baseDir/$projectId"))
     .enablePlugins(ScalaJSBundlerPlugin)
     .settings(nexusNpmSettings)
+    .settings(requireJsDomEnv in Test := true)
     .settings(scalacOptions := Seq("-deprecation", "-feature", "-Xfatal-warnings", "-Ymacro-annotations"))
 
 def demoProject(projectId: String): Project =
