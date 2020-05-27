@@ -18,6 +18,8 @@ inThisBuild(
     organization := "io.metabookmarks",
     bintrayOrganization := Some("metabookmarks"),
     bintrayRepository := "releases",
+    startYear := Some(2020),
+    licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0")),
     scalacOptions ++= Seq("-deprecation", "-feature", "-Xfatal-warnings", "-Ymacro-annotations")
   )
 )
@@ -97,6 +99,7 @@ lazy val `material-components-web` = scalajsProject("material-components-web")
 
 lazy val `material-ui` = slinkyWrapperProject("material-ui")
   .settings(
+    bintrayRepository := "releases",
     normalizedName := "slinky-material-ui"
   )
   .settings(
