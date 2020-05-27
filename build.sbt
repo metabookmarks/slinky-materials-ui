@@ -16,6 +16,8 @@ inThisBuild(
     scalaVersion := scala213,
     scalafmtOnCompile := true,
     organization := "io.metabookmarks",
+    bintrayOrganization := Some("metabookmarks"),
+    bintrayRepository := "releases",
     scalacOptions ++= Seq("-deprecation", "-feature", "-Xfatal-warnings", "-Ymacro-annotations")
   )
 )
@@ -88,6 +90,9 @@ lazy val `material-components-web` = scalajsProject("material-components-web")
     Compile / npmDependencies += "material-components-web" -> "6.0.0",
     Compile / npmDependencies += "react" -> "16.13.1",
     Compile / npmDependencies += "react-dom" -> "16.13.1"
+  ).settings(
+    publish := {},
+    publishLocal := {}
   )
 
 lazy val `material-ui` = slinkyWrapperProject("material-ui")
