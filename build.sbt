@@ -120,6 +120,8 @@ lazy val server = project
   .in(file("demo-akka-http/server"))
   .enablePlugins(SbtWeb, SbtTwirl, JavaAppPackaging, WebScalaJSBundlerPlugin)
   .settings(
+    cancelable := true,
+    fork := true,
     scalaJSProjects := Seq(client, `mdc-demo`),
     pipelineStages in Assets := Seq(scalaJSPipeline),
     // triggers scalaJSPipeline when using compile or continuous compilation
@@ -166,8 +168,8 @@ lazy val shared = crossProject(JSPlatform, JVMPlatform)
 lazy val sharedJvm = shared.jvm
 lazy val sharedJs = shared.js
 
-Global / cancelable := true
-Global / fork := true
+//Global / cancelable := true
+//Global / fork := true
 Test / fork  := false
 // loads the server project at sbt startup
 //onLoad in Global := (onLoad in Global).value.andThen(state => "project server" :: state)
