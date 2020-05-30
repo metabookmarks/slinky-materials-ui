@@ -14,12 +14,14 @@ import org.scalajs.dom.raw.Event
 
   type Props = Unit
 
-  case class State(open: Boolean)
+  case class State(open: Boolean, snackOpen: Boolean)
 
   @react object SimpleDialog {
     case class Props(name: String, ok1: Boolean = false, ok2: Boolean = false, folder: String = "")
+
     val component = FunctionalComponent[Props] { props =>
       val (open, setOpen) = useState(true)
+
       val (clicked1, setClicked1) = useState(props.ok1)
       val (clicked2, setClicked2) = useState(props.ok2)
       val (folder, setFolder) = useState(props.folder)
@@ -72,7 +74,17 @@ import org.scalajs.dom.raw.Event
   def render =
     div(
       if (state.open) Some(SimpleDialog(name = "zozo")) else None,
-      div(Button(onClick = e => setState(st => st.copy(open = true)))(span("Helo")))
+      div(Button(onClick = e => setState(st => st.copy(open = true)))(span("Helo"))),
+      if (state.snackOpen)
+        Some(
+          Snackbar(open = state.snackOpen,
+                   message = "yo",
+                   autoHideDuration = 5000,
+                   onClose = () => setState(st => st.copy(snackOpen = false))
+          )
+        )
+      else None,
+      div(Button(onClick = e => setState(st => st.copy(snackOpen = true)))(span("snack")))
     )
-  def initialState: State = State(false)
+  def initialState: State = State(false, false)
 }
