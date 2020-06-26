@@ -71,7 +71,7 @@ import org.scalajs.dom.raw.Event
     }
   }
 
-  def render =
+  def render() =
     div(
       if (state.open) Some(SimpleDialog(name = "zozo")) else None,
       div(Button(onClick = e => setState(st => st.copy(open = true)))(span("Helo"))),

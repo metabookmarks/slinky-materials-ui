@@ -9,7 +9,7 @@ import org.scalajs.dom.raw.DataTransfer
 @react class ChipsDemo extends StatelessComponent {
   type Props = Unit
 
-  def render =
+  def render() =
     Chips(
       List("one", "two", "three", "four"),
       new EventManager {

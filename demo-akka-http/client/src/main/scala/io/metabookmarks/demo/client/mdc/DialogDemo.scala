@@ -9,7 +9,7 @@ import io.metabookmarks.demo.client.FormDemo
 @react class DialogDemo extends StatelessComponent {
   case class Props(name: String)
 
-  def render =
+  def render() =
     h1(
       s"Hello ${props.name}",
       button(

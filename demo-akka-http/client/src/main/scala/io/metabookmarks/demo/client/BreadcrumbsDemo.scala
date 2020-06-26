@@ -10,7 +10,7 @@ import slinky.materialui.core._
 @react class BreadcrumbsDemo extends StatelessComponent {
   type Props = Unit
 
-  def render =
+  def render() =
     Breadcrumbs(separator = " 🍎 ")(
       CircularProgress(),
       Link(href := "/", onClick := (e => println("One")))("aa"),
