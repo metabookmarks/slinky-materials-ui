@@ -40,6 +40,7 @@ import io.metabookmarks.demo.client.surfaces.CardDemo
 import io.metabookmarks.demo.shared.User
 import io.metabookmarks.demo.client.surfaces.ProfileDemo
 import io.metabookmarks.demo.shared.Profile
+import slinky.materialui.icons.FolderIcon
 
 object MDCKitchen {
 
@@ -63,23 +64,8 @@ object MDCKitchen {
             "Date Picker" icon "widgets" content DatePickerDemo(date = new js.Date(1971, 3, 22))
           ),
           Some(
-            ProfileDemo(
-              User(
-                email = "olivier.nouguier@gmail.com",
-                firstName = Some("Olivier"),
-                lastName = Some("NOUGUIER"),
-                avatarURL = Some("https://s.gravatar.com/avatar/b2484ef33a94ebdcd47de7d3dff41515?s=80"),
-                profiles = Map(
-                  "twitter" -> Profile(
-                    providerKey = "IIII",
-                    fullName = Some("zozo")
-                  ),
-                  "google" -> Profile(
-                    providerKey = "IIII",
-                    fullName = Some("zozo")
-                  )
-                )
-              )
+            GridContainer(
+              GridItem(key = "e", sm = Size.`8`)(Icon(color = "primary")("folder"))
             )
           )
         ),
