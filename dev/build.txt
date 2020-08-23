@@ -1,0 +1,7 @@
+enablePlugins(ScalaJSBundlerPlugin)
+
+
+
+addCommandAlias("dev", ";fastOptJS::startWebpackDevServer;~fastOptJS")
+
+addCommandAlias("build", "fullOptJS::webpack")

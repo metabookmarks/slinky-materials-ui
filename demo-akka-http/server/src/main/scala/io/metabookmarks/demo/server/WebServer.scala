@@ -17,7 +17,8 @@ object WebServer {
 
     val service = new WebService()
 
-    val fut = Http().bindAndHandle(service.route, interface, port)
+    val builder = Http().newServerAt(interface, port)
+    val fut = builder.bind(service.route)
 
     fut.foreach { binding =>
       sys.addShutdownHook {
