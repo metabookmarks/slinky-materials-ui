@@ -51,9 +51,7 @@ trait Styles extends js.Object {
       Paper(className = classes.paper)(
         GridContainer(spacing = 2)(
           GridItem(key = s"photo")(
-            ButtonBase(className = classes.image)(
-              img(className := classes.img, src := user.avatarURL)
-            )
+            Avatar(className := classes.img, alt := "zozo", src := user.avatarURL)
           ),
           Grid(key = s"gen", sm = true, xs = Size.`12`)(
             Grid(xs = true, direction = "column", spacing = 2)(

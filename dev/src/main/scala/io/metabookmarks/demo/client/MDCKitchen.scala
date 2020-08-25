@@ -67,7 +67,14 @@ object MDCKitchen {
           title = "Material UI",
           subTitle = "0.1",
           items = List(
-            "Home" icon "home" href "/",
+            "Home" icon "home" content ProfileDemo(
+              new User("olivier.nouguier@gmail.com",
+                       avatarURL = Some(
+                         "https://en.gravatar.com/userimage/24489484/b46b872093177431458ab2d118468cc2.png"
+                       ),
+                       profiles = Map.empty
+              )
+            ),
             "Buttons" icon "widgets" content ButtonsDemo(),
             "Cards" icon "dashboard" content CardDemo(),
             "Dialog" icon "dashboard" content DialogDemo(),
