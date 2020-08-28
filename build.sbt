@@ -9,7 +9,7 @@ val scala213 = "2.13.3"
 
 name := "Scala.js Slinky Material UI"
 
-val slinkyVersion = "0.6.5"
+val slinkyVersion = "0.6.6"
 
 inThisBuild(
   List(
