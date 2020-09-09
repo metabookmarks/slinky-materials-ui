@@ -11,10 +11,8 @@ import slinky.materialui.core._
   type Props = Unit
 
   def render(): ReactElement =
-    ButtonGroup(disabled = true)(
+    ButtonGroup(disabled = false)(
       Button(onClick = e => println("one"))("One"),
-      Button(onClick = e => println("two"))("Two"),
-      Button(onClick = e => println("three"))("Three")
+      Button(onClick = e => println("two"))("Two")
     )
-
 }
