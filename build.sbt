@@ -5,7 +5,7 @@ enablePlugins(ScalaJSPlugin)
 val slinkySourceMap =
   "-P:scalajs:mapSourceURI:file:/Users/chelebithil/projects/shadaj/slinky->https://raw.githubusercontent.com/shadaj/slinky/v0.6.5/slinky/"
 
-val scala213 = "2.13.3"
+val scala213 = "2.13.4"
 
 name := "Scala.js Slinky Material UI"
 

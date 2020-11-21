@@ -11,7 +11,7 @@ import org.scalajs.dom.raw.DataTransfer
 
   def render() =
     Chips(
-      List("one", "two", "three", "four"),
+      List("one", "two", "three", "four", "five"),
       new EventManager {
 
         override def onClick(key: String): Unit = println(s"$key clicked")
