@@ -32,3 +32,5 @@ The library project
 
 A sample project.
 
+scala js 1.3.x ===> 0.1.x
+scala js 1.4.x ===> 0.2.x
