@@ -16,8 +16,8 @@ inThisBuild(
     scalaVersion := scala213,
     scalafmtOnCompile := true,
     organization := "io.metabookmarks",
-    bintrayOrganization := Some("metabookmarks"),
-    bintrayRepository := "releases",
+    githubOwner := "metabookmarks",
+    githubRepository := "sbt-github-packages",
     startYear := Some(2020),
     licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0")),
     scalacOptions ++= Seq("-deprecation", "-feature", "-Xfatal-warnings", "-Ymacro-annotations")
@@ -100,7 +100,6 @@ lazy val `material-components-web` = scalajsProject("material-components-web")
 
 lazy val `material-ui` = slinkyWrapperProject("material-ui")
   .settings(
-    bintrayRepository := "releases",
     normalizedName := "slinky-material-ui"
   )
   .settings(
@@ -174,8 +173,8 @@ lazy val server = project
     // triggers scalaJSPipeline when using compile or continuous compilation
     compile in Compile := ((compile in Compile) dependsOn scalaJSPipeline).value,
     libraryDependencies ++= Seq(
-        "com.typesafe.akka" %% "akka-http" % "10.2.2",
-        "com.typesafe.akka" %% "akka-stream" % "2.6.10",
+        "com.typesafe.akka" %% "akka-http" % "10.2.3",
+        "com.typesafe.akka" %% "akka-stream" % "2.6.12",
         "com.vmunier" %% "scalajs-scripts" % "1.1.4"
       ),
     WebKeys.packagePrefix in Assets := "public/",
