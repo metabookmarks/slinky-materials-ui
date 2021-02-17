@@ -17,7 +17,7 @@ inThisBuild(
     scalafmtOnCompile := true,
     organization := "io.metabookmarks",
     githubOwner := "metabookmarks",
-    githubRepository := "sbt-github-packages",
+    githubRepository := "slinky-materials-ui",
     startYear := Some(2020),
     licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0")),
     scalacOptions ++= Seq("-deprecation", "-feature", "-Xfatal-warnings", "-Ymacro-annotations")
